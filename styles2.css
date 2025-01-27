@@ -1,0 +1,853 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#creditSystem {
+    position: fixed;
+    bottom: 20px;
+    right: 60px;
+    background: #2a2a4f;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    text-align: center;
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+#creditBalance {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#buyCredits, #startFreeTrial {
+    background: linear-gradient(135deg, #00a8ff, #007bff);
+    color: #fff;
+    border: none;
+    padding: 8px 16px; /* Slightly larger padding for better visibility */
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background 0.3s ease;
+}
+
+#buyCredits:hover, #startFreeTrial:hover {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+
+body {
+    display: flex;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+    overflow-x: hidden;
+}
+
+/* Sidebar with your existing styles plus scrollbar */
+#sidebar {
+    width: 300px;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
+    color: #fff;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow-y: auto;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: width 0.3s ease;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* Effect Controls - Floating Panel */
+#effectControls {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 120%;
+    background: rgba(30, 30, 47, 0.8); /* Semi-transparent dark background */
+    backdrop-filter: blur(10px); /* Glass blur effect */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+    z-index: 100;
+}
+
+/* Base dropdown styling */
+#sidebar .action-dropdown {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 15px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #1a1a2f, #2a2a4f);
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-align: center;
+    /* Center the text */
+    text-align-last: center;
+    /* Center text in Firefox */
+    -moz-text-align-last: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover state */
+#sidebar .action-dropdown:hover {
+    background: linear-gradient(145deg, #2a2a4f, #3a3a6f);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Focus state */
+#sidebar .action-dropdown:focus {
+    outline: none;
+    background: linear-gradient(145deg, #2a2a4f, #3a3a6f);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Custom dropdown arrow using SVG */
+#sidebar .action-dropdown {
+    background-image: 
+        linear-gradient(145deg, #1a1a2f, #2a2a4f),
+        url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: auto, 16px;
+    padding-right: 45px;
+}
+
+/* Dropdown options styling */
+#sidebar .action-dropdown option {
+    background-color: #1a1a2f;
+    color: #fff;
+    padding: 15px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Option hover state */
+#sidebar .action-dropdown option:hover {
+    background-color: #2a2a4f;
+}
+
+/* Active/selected option */
+#sidebar .action-dropdown option:checked {
+    background-color: #3a3a6f;
+    color: #fff;
+}
+
+#effectControls .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#effectControls input,
+#effectControls button {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+#effectControls button {
+    /* background: linear-gradient(135deg, #007bff, #00a8ff) !important; */
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#effectControls button:hover {
+    /* background: linear-gradient(135deg, #0056b3, #007bff); */
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.95), rgba(35, 35, 35, 0.95));
+
+    transform: translateY(-2px); /* Lift effect on hover */
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.6); /* Glow effect */
+}
+
+#effectControls label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+#effectControls input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    #sidebar {
+        width: 250px;
+    }
+
+    #mainContent {
+        margin-left: 270px;
+    }
+}
+
+/* Webkit scrollbar styling */
+#sidebar::-webkit-scrollbar {
+    width: 7px;
+    background: transparent;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover {
+    /* background: rgba(255, 255, 255, 0.3); */
+    background: linear-gradient(135deg, #300036, #002538);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Glow effect */
+
+}
+
+
+
+
+
+/* Controls styling */
+#sidebar .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#sidebar input[type="file"],
+#sidebar input[type="number"],
+#sidebar input[type="range"],
+#sidebar button {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #13131f, #232338);
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#sidebar button {
+    /* background: linear-gradient(135deg, #007bff, #00a8ff); */
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#sidebar button:hover {
+    /* background: linear-gradient(135deg, #0056b3, #007bff); */
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.95), rgba(35, 35, 35, 0.95));
+
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+#sidebar label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #ddd;
+    font-size: 14px;
+}
+
+#sidebar input[type="file"]::file-selector-button {
+    /* background: linear-gradient(135deg, #007bff, #00a8ff); */
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+
+    color: #fff;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#masterCheckboxControl {
+    /* margin-top: 20px; */
+    /* padding: 15px; */
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+}
+
+
+
+#effectControls {display: flex; flex-direction: column; gap: 1px;}
+
+
+/* Effect Controls - Floating Panel */
+#effectControls {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100%;
+    background: rgba(30, 30, 47, 0.8); /* Semi-transparent dark background */
+    backdrop-filter: blur(10px); /* Glass blur effect */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+    z-index: 100;
+}
+#mainContent {flex-grow: 1; padding: 20px; overflow-y: auto;}
+#mainContent {
+    
+    margin-left: 320px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: margin-left 0.3s ease;
+}
+
+
+/* Image Container */
+#imageContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+
+
+
+
+.image-wrapper {
+    flex: 1 1 auto; /* Allow items to shrink or grow as needed */
+    text-align: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+@media (max-width: 768px) {
+    #sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+
+    #mainContent {
+        margin-left: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    #sidebar {
+        width: 250px;
+    }
+
+    #mainContent {
+        margin-left: 270px;
+    }
+}
+
+#mainContent {
+    margin-left: 320px;
+    padding: 30px;
+
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: margin-left 0.3s ease;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+#effectControls .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#effectControls input,
+#effectControls button {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.9);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+#effectControls button {
+    /* background: linear-gradient(135deg, #007bff, #00a8ff) !important; */
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#effectControls button:hover {
+
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.95), rgba(35, 35, 35, 0.95));
+
+    /* background: linear-gradient(135deg, #0056b3, #007bff); */
+    transform: translateY(-2px); /* Lift effect on hover */
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); /* Glow effect */
+}
+
+#effectControls label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+#effectControls input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+
+/* Effect Controls */
+#effectControls .effect-control {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+#effectControls label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+#effectControls input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#effectControls input[type="checkbox"]:checked {
+    background: #007bff;
+}
+
+#effectControls {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100%;
+    background-color: #f4f4f4;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-left: 1px solid #ddd;
+    z-index: 100;
+}
+
+#effectControls .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#effectControls input,
+#effectControls button {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#effectControls label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+#effectControls input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+
+#effectControls {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 350px;
+    height: 100%;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border-left: 1px solid #ddd;
+    z-index: 100;
+}
+#imageCanvas { border: 1px solid black; }
+#generatedImages img { max-width: 1000px; margin: 5px; }
+#generatedImages {
+    display: grid;
+    gap: 20px;
+}
+.segmented-images {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 10px;
+    margin-top: 20px;
+}
+.segment-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.segment-wrapper p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+.segment-wrapper canvas {
+    border: 1px solid #ddd;
+}
+#imageContainer {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+/* Image Container */
+#imageContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+
+
+
+
+.image-wrapper {
+
+    
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.effect-button.active {
+    /* background-color: #4CAF50;  */
+    /* background: #0056b3; */
+
+    color: white;
+}
+
+.effect-button.inactive {
+    background-color: #f0f0f0; /* Light gray when inactive */
+    color: #333;
+}
+.image-wrapper img {
+    max-width: 100%; /* Ensure images do not exceed container width */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design for Vertical Stacking */
+@media (max-width: 1024px) {
+    #imageContainer {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        align-items: center; /* Center-align the images */
+    }
+
+    .image-wrapper {
+        width: 90%; /* Make the image wrapper occupy most of the screen width */
+    }
+}
+#imageContainer {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping of elements */
+    justify-content: center; /* Center-align items */
+    align-items: flex-start; /* Align items at the top */
+    gap: 20px; /* Add spacing between items */
+    margin-top: 20px;
+    max-width: 50%; /* Restrict the container's width to prevent overflow */
+}
+.image-wrapper img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Canvas */
+canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Position the master checkbox on the right-hand side */
+
+/* Master Checkbox Control Styling */
+#masterCheckboxControl {
+    position: fixed;
+    top: 0px;
+    right: 155px;
+    z-index: 1000;
+    /* background: rgba(30, 30, 47, 0.8); */
+    backdrop-filter: blur(10px);
+    padding: 15px 20px;
+    /* border: 1px solid rgba(255, 255, 255, 0.1); */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#masterCheckboxControl input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    /* background: rgba(255, 255, 255, 0.1); */
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-right: 8px;
+}
+
+#masterCheckboxControl input[type="checkbox"]:checked {
+    background: #007bff;
+}
+
+#masterCheckboxControl label {
+    font-size: 14px;
+    color: #ddd;
+    cursor: pointer;
+}
+
+/* Hover effect for better interactivity */
+/* #masterCheckboxControl input[type="checkbox"]:hover {
+    background: rgba(255, 255, 255, 0.2);
+} */
+
+/* Progress Bar */
+#progress {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 16px;
+    color: #555;
+}
+#effectControls .controls {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#effectControls input,
+#effectControls button {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    /* background-color: rgba(255, 255, 255, 0.1); */
+    /* color: #fff;  */
+}
+
+#effectControls label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ddd; /* Light text color */
+}
+
+#effectControls input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+#effectControls button {
+    /* background-color: #4CAF50; */
+    /* background: #0056b3; */
+    /* background: #007bff; */
+    /* color: white; */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Canvas Wrapper - Modern Styling */
+.canvas-wrapper {
+    display: inline-block;
+    width: 300px;
+    height: 300px;
+    margin: 10px;
+    text-align: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.canvas-wrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.canvas-wrapper img {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+    .canvas-wrapper {display: inline-block; 
+        width: 300px;
+        height: 300px;
+        margin: 5px; 
+        text-align: center;}
+
+#masterCheckboxControl {
+    /* margin-bottom: 15px; */
+}
+/* .canvas-wrapper img{
+    width: 100px;
+    height: 100px;
+} */
+.canvas-wrapper img{
+    width: 300px;
+    height: 300px;
+}
+
+#effectControls button:hover {
+    /* background-color: #45a049; */
+    /* background: #0056b3; */
+    /* background: linear-gradient(135deg, #007bff, #00a8ff); */
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.95), rgba(35, 35, 35, 0.95));
+
+}
+
+#effectControls input[type="range"] {
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.image-wrapper,
+canvas,
+#progress {
+    animation: fadeIn 1s ease;
+}
+
+.image-container {
+    display: inline-block; /* Display images side by side */
+    margin: 10px; /* Add some spacing between images */
+  }
+  
+  /* .image-container img {
+    width: 100px; 
+    height: 100px;
+  } */
+
+  
+  .image-container img {
+    width: 300px; 
+    height: 300px;
+  } 
+
+ 
+  .timer-wrapper {
+    margin-bottom: 15px;
+}
+
+.timer-container {
+    font-family: monospace;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.processed-image {
+    width: 100%; /* Adjust as needed */
+    height: auto; /* Adjust as needed */
+}
+.image-sequence-container {
+    position: relative;
+    width: 100%;
+    height: 600px; /* Adjust based on your image sizes */
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.image-sequence-container img {
+    object-fit: contain;
+}
+
+.digital-timer {
+    color: #007bff;
+    font-size: 24px;
+    letter-spacing: 3px;
+    font-weight: normal;
+    text-align: center;
+    font-family: monospace;
+}
+
+.timer-label {
+    color: #ddd;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: monospace;
+}

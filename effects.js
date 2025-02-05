@@ -1,9 +1,5 @@
-//jumpleft not working
-
 const effects = 
 [
-    "fullleft",
-    "clock",
     "lrsqueeze",
     "persanticlockrotate",
     "dancechest",
@@ -41,7 +37,8 @@ const effects =
     "squeezey2",
     "createround",
     "topviewwaterripple",
-    "butterfly",
+    "fullleft",
+    "clock",
     "butterfly1",
     "twist",
     "tiltsmall",
@@ -64,230 +61,240 @@ const effects =
     "leftdownzerorightdown",
     "projectile",
     "projectile1",
+    'fanceiling',
+    'fanceiling1',
+    'fanceiling2',
+    'fanceilingfast',
+    'fanceilingfast1',
     "projectile2",
     "projectile3",
     "projectiletopleft",
     "reverseclock",
     "lefttoprightcircle",
     "infinite",
-    // "spongeball",
-    // "downelongate",
-    // "standing",
-    // "rightsidesitting",
-    // "rightsidesitting1",
-    // "running2",
-    // "running3",
-    // "running4",
-    // "running5",
-    // "running6",
-    // "running7",
-    // "running8",
-    // "running9",
-    // "running10",
-    // "running11",
-    // "running12",
-    // "running14",
-    // "running15",
-    // "running16",
-    // "running17",
-    // "running18",
-    // "running19",
-    // "running20",
-    // "running21",
-    // "running22",
-    // "running23",
-    // "running24",
-    // "running25",
-    // "running26",
-    // "running27",
-    // "running28",
-    // "running29",
-    // "running30",
-    // "running31",
-    // "running32",
-    // "running33",
-    // "running34",
-    // "running35",
-    // "running36",
-    // "anticlockwisemove",
-    // "running37",
-    // "backgroundpredict2",
-    // "backgroundpredict3",
-    // "backgroundpredict4",
-    // "backgroundpredict5",
-    // "backgroundpredict6",
-    // "backgroundpredict7",
-    // "backgroundpredict",
-    // "background",
-    // "BHUE",
-    // "blockDissolve1",
-    // "blockDissolve",
-    // "bottom10",
-    // "up10",
-    // "bottomleft",
-    // "fullright",
-    // "bottomright",
-    // "upright",
-    // "upleft",
-    // "brightness1",
-    // "brightness3",
-    // "brightness",
-    // "bulgepinch101",
-    // "bulgepinch103",
-    // "bulgepinch104",
-    // "bulgepinch102",
-    // "scale",
-    // "bulgepinch10",
-    // "bulgePinch1",
-    // "bulgePinch2",
-    // "bulgePinch3",
-    // "bulgePinch4",
-    // "colorHalfTone",
-    // "colorUtils",
-    // "replaceimage1",
-    // "denoise1",
-    // "depthAnd3DEffect",
-    // "depthEstimation",
-    // "depthMap",
-    // "dotScreen",
-    // "down10",
-    // "downleft10",
-    // "downright10",
-    // "droste10",
-    // "droste11",
-    // "edgework101",
-    // "edgework102",
-    // "edgework10",
-    // "faceindexmovement1",
-    // "hexagonalPixelate",
-    // "hue10",
-    // "hue1",
-    // "hue",
-    // "indexlips",
-    // "indexlipsqueeze",
-    // "indexlipscartoon",
-    // "outline",
-    // "ink1",
-    // "invert",
-    // "jump",
-    // "kaleidoscopefullimage",
-    // "kaleidoscope",
-    // "left10",
-    // "right10",
-    // "lipsync1",
-    // "lensBlur",
-    // "lipsync",
-    // "lipsync10",
-    // "parallax3d",
-    // "parallaxdown10",
-    // "parallaxdownsmall10",
-    // "parallaxleft10",
-    // "parallaxleftlarge10",
-    // "border",
-    // "parallaxVR10",
-    // "parallaxleftsmall10",
-    // "parallaxVR101",
-    // "perspectiveCubeMap",
-    // "perspectiveVRcubemap",
-    // "rotatecentre",
-    // "perspectiveVRcubemap1",
-    // "perspectiveVRcubemap2",
-    // "perspectiveCurve",
-    // "fullimagesidebyside",
-    // "perspectiveCurvecopy3",
-    // "cylinder",
-    // "perspectiveCylinder",
-    // "perspectiveEmboss",
-    // "perspectiveextend",
-    // "perspectiveField",
-    // "perspectiveFieldselectedregion",
-    // "perspectiveFisheye",
-    // "perspectiveFold",
-    // "perspectivestepup",
-    // "perspectiverotate1",
-    // "perspectiveKaleidoscope",
-    // "perspectiveMosaic",
-    // "perspectivePinch",
-    // "perspectivePinch1",
-    // "perspectivePosterize",
-    // "perspectiveRotate",
-    // "perspectiveSkew",
-    // "perspectiveSphere",
-    // "perspectivesqueeze1",
-    // "perspectiveSqueeze",
-    // "perspectiveTilt1",
-    // "perspectiveTilt2",
-    // "zoom",
-    // "perspectiveTunnel",
-    // "perspectiveTwist",
-    // "perspectiveTwist1",
-    // "perspectiveVortex",
-    // "bookfold",
-    // "perspectiveWarp",
-    // "perspectiveWave",
-    // "perspectiveWrap",
-    // "perspectiveZoom",
-    // "perspectiveZoom1",
-    // "posedetection",
-    // "pp2",
-    // "mesh",
-    // "pp3",
-    // "pp4",
-    // "pp5",
-    // "randompic",
-    // "removebg",
-    // "rotatebottomleftccw",
-    // "rotatebottomleftcw",
-    // "rotatebottomleftvariable",
-    // "rotatebottomleft",
-    // "projectileleft",
-    // "rotatebottomrightccw",
-    // "projectileleft1",
-    // "rotatebottomrightcw",
-    // "rotatebottomright",
-    // "rotatetopleftccw",
-    // "rotatetopleftcw",
-    // "rotatetopleft",
-    // "rotatetoprightccw",
-    // "rotatetoprightcw",
-    // "3d",
-    // "runninganti",
-    // "balloon",
-    // "runningleg2",
-    // "runningleg3",
-    // "runningleg4",
-    // "oscillate",
-    // "runningleg",
-    // "running",
-    // "saturation10",
-    // "segmentation10",
-    // "segmentation11",
-    // "segmentation12",
-    // "segmentimageselectedregion1",
-    // "segmentimageselectedregion",
-    // "sittinganti",
-    // "sitting",
-    // "smooth-edges",
-    // "smoothedgelight",
-    // "smoothedges2",
-    // "squeeze1",
-    // "widen",
-    // "squeeze2",
-    // "squeeze3",
-    // "squeezex1",
-    // "squeezex",
-    // "squeezey1",
-    // "squeezey",
-    // "swirl",
-    // "threeDE",
-    // "droste",
-    // "running1"
+    "spongeball",
+    "downelongate",
+    "standing",
+    "rightsidesitting",
+    "rightsidesitting1",
+    "running2",
+    "running3",
+    "running4",
+    "running5",
+    "running6",
+    "running7",
+    "running8",
+    "running9",
+    "running10",
+    "running11",
+    "running12",
+    "running14",
+    "running15",
+    "running16",
+    "running17",
+    "running18",
+    "running19",
+    "running20",
+    "running21",
+    "running22",
+    "running23",
+    "running24",
+    "running25",
+    "running26",
+    "running27",
+     "running28",
+    "running29",
+    "running30",
+    "running31",
+    "running32",
+    "running33",
+    "running34",
+    "running35",
+    "running36",
+    "running37",
+    "backgroundpredict2",
+    "backgroundpredict3",
+    "backgroundpredict4",
+    "backgroundpredict5",
+    "backgroundpredict6",
+    "backgroundpredict7",
+    "backgroundpredict",
+    "background",
+    "BHUE",
+    "colorchange",
+    "blockDissolve1",
+    "blockDissolve",
+    "bottom10",
+    "up10",
+    "bottomleft",
+    "fullright",
+    "bottomright",
+    "upright",
+    "upleft",
+    "brightness1",
+    "brightness3",
+    "brightness",
+    "bulgepinch101",
+    "bulgepinch103",
+    "bulgepinch104",
+    "bulgepinch102",
+    "scale",
+    "bulgepinch10",
+    "bulgePinch1",
+    "bulgePinch2",
+    "bulgePinch3",
+    "bulgePinch4",
+    "colorHalfTone",
+    "colorUtils",
+    "replaceimage1",
+    "denoise1",
+    "depthAnd3DEffect",
+    "depthEstimation",
+    "depthMap",
+    "dotScreen",
+    "down10",
+    "downleft10",
+    "downright10",
+    "droste10",
+    "droste11",
+    "edgework101",
+    "edgework102",
+    "edgework10",
+    "faceindexmovement1",
+    "hexagonalPixelate",
+    "hue10",
+    "hue1",
+    "hue",
+    'reallips1',
+    'reallips2',
+    'reallips3',
+    'reallips4',
+    'reallips5',
+    'reallips6',
+    'reallips7',
+    'reallips8',
+    "indexlips",
+    "indexlipsqueeze",
+    "indexlipscartoon",
+    "outline",
+    "ink1",
+    "invert",
+    "jump",
+    "kaleidoscopefullimage",
+    "kaleidoscope",
+    "left10",
+    "right10",
+    "lipsync1",
+    "lensBlur",
+    "lipsync",
+    "lipsync10",
+    "parallax3d",
+    "parallaxdown10",
+    "parallaxdownsmall10",
+    "parallaxleft10",
+    "parallaxleftlarge10",
+    "border",
+    "parallaxVR10",
+    "parallaxleftsmall10",
+    "parallaxVR101",
+    "perspectiveCubeMap",
+    "perspectiveVRcubemap",
+    "rotatecentre",
+    "perspectiveVRcubemap1",
+    "perspectiveVRcubemap2",
+    "perspectiveCurve",
+    "fullimagesidebyside",
+    "perspectiveCurvecopy3",
+    "cylinder",
+    "perspectiveCylinder",
+    "perspectiveEmboss",
+    "perspectiveextend",
+    "perspectiveField",
+    "perspectiveFieldselectedregion",
+    "perspectiveFisheye",
+    "perspectiveFold",
+    "perspectivestepup",
+    "perspectiverotate1",
+    "perspectiveKaleidoscope",
+    "perspectiveMosaic",
+    "perspectivePinch",
+    "perspectivePinch1",
+    "perspectivePosterize",
+    "perspectiveRotate",
+    "perspectiveSkew",
+    "perspectiveSphere",
+    "perspectivesqueeze1",
+    "perspectiveSqueeze",
+    "perspectiveTilt1",
+    "perspectiveTilt2",
+    "zoom",
+    "perspectiveTunnel",
+    "perspectiveTwist",
+    "perspectiveTwist1",
+    "perspectiveVortex",
+    "bookfold",
+    "perspectiveWarp",
+    "perspectiveWave",
+    "perspectiveWrap",
+    "perspectiveZoom",
+    "perspectiveZoom1",
+    "posedetection",
+    "pp2",
+    "mesh",
+    "pp3",
+    "pp4",
+    "pp5",
+    "randompic",
+    "removebg",
+    
+    "rotatebottomleftccw",
+    "rotatebottomleftcw",
+    "rotatebottomleftvariable",
+    "rotatebottomleft",
+    "projectileleft",
+    "rotatebottomrightccw",
+    "projectileleft1",
+    "rotatebottomrightcw",
+    "rotatebottomright",
+    "rotatetopleftccw",
+    "rotatetopleftcw",
+    "rotatetopleft",
+    "rotatetoprightccw",
+    "rotatetoprightcw",
+    "3d",
+    "runninganti",
+    "balloon",
+    "runningleg2",
+    "runningleg3",
+    "runningleg4",
+    "oscillate",
+    "runningleg",
+    "running",
+    "saturation10",
+    "segmentation10",
+    "segmentation11",
+    "segmentation12",
+    "segmentimageselectedregion1",
+    "segmentimageselectedregion",
+    "sittinganti",
+    "sitting",
+    "smooth-edges",
+    "smoothedgelight",
+    "smoothedges2",
+    "squeeze1",
+    "widen",
+    "squeeze2",
+    "squeeze3",
+    "squeezex1",
+    "squeezex",
+    "squeezey1",
+    "squeezey",
+    "swirl",
+    "threeDE",
+    "droste",
+    "running1"
 ]
 
-// const uniqueEffects = [...new Set(effects)];
-
-// // Log the unique effects
-// console.log("Unique Effects:", uniqueEffects);
 
 const animationEffects = [
     // 'perspectiveTilt', 'perspectiveSqueeze', 'perspectiveCurve', 'perspectiveTwist',
@@ -319,15 +326,34 @@ function toggleAnimationEffects() {
     updateMasterCheckbox();
 }
 
+// function toggleAllEffects() {
+//     const isChecked = masterCheckbox.checked;
+//     effects.forEach(effect => {
+//         if (!animationEffects.includes(effect)) {
+//             document.getElementById(effect + 'Checkbox').checked = isChecked;
+//         }
+//     });
+// }
 function toggleAllEffects() {
     const isChecked = masterCheckbox.checked;
+    const searchTerm = effectSearchBar.value.toLowerCase();
+    
     effects.forEach(effect => {
         if (!animationEffects.includes(effect)) {
-            document.getElementById(effect + 'Checkbox').checked = isChecked;
+            const checkbox = document.getElementById(effect + 'Checkbox');
+            if (checkbox) {
+                // Only toggle checkboxes for visible effects (matching search)
+                const effectDiv = checkbox.closest('.effect-control');
+                if (effectDiv.style.display !== 'none') {
+                    checkbox.checked = isChecked;
+                }
+            }
         }
     });
+    
+    // Update displayed buttons after toggling checkboxes
+    displayEffectButtons();
 }
-
 function updateMasterCheckbox() {
     const effectCheckboxes = effects.filter(effect => !animationEffects.includes(effect));
     const allChecked = effectCheckboxes.every(effect => document.getElementById(effect + 'Checkbox').checked);
@@ -499,47 +525,106 @@ function applyEffect(effect, imageData, value, selectedRegions) {
 //     });
 // }
 
+// function displayEffectButtons() {
+//     // Clear existing buttons
+//     Array.from(effectControls.children).forEach(child => {
+//         if (child.tagName !== 'DIV') { // Assuming checkboxes are in div containers
+//             child.remove();
+//         }
+//     });
+
+//     // Sort effects: checked effects first, then unchecked
+//     const sortedEffects = effects.sort((a, b) => {
+//         const aChecked = document.getElementById(`${a}Checkbox`).checked;
+//         const bChecked = document.getElementById(`${b}Checkbox`).checked;
+//         if (aChecked && !bChecked) return -1; // a comes first
+//         if (!aChecked && bChecked) return 1;  // b comes first
+//         return 0; // no change in order
+//     });
+
+//     // Create and display buttons in the sorted order
+//     sortedEffects.forEach(effect => {
+
+//         const isChecked = document.getElementById(`${effect}Checkbox`).checked;
+
+//         // Only create a button for checked effects
+//         if (isChecked) {
+
+//         const button = document.createElement('button');
+//         button.className = 'effect-button';
+//         button.textContent = effect;
+//         button.dataset.effect = effect;
+//         button.dataset.active = 'true';
+//         button.addEventListener('mouseenter', () => displayEffectImages(effect));
+//         button.addEventListener('click', () => { toggleEffect(button); displayEffectImages(effect); });
+        
+//         const checkboxDiv = document.querySelector(`.effect-control input[id="${effect}Checkbox"]`).closest('.effect-control');
+//         checkboxDiv.insertAdjacentElement('afterend', button);
+//     }
+
+
+//     });
+// }
+
+
+
 function displayEffectButtons() {
-    // Clear existing buttons
+    const searchTerm = effectSearchBar.value.toLowerCase();
+    
+    // Clear existing buttons first
     Array.from(effectControls.children).forEach(child => {
-        if (child.tagName !== 'DIV') { // Assuming checkboxes are in div containers
+        if (child.tagName !== 'DIV') {
             child.remove();
         }
     });
 
-    // Sort effects: checked effects first, then unchecked
-    const sortedEffects = effects.sort((a, b) => {
-        const aChecked = document.getElementById(`${a}Checkbox`).checked;
-        const bChecked = document.getElementById(`${b}Checkbox`).checked;
-        if (aChecked && !bChecked) return -1; // a comes first
-        if (!aChecked && bChecked) return 1;  // b comes first
-        return 0; // no change in order
-    });
-
-    // Create and display buttons in the sorted order
-    sortedEffects.forEach(effect => {
-
-        const isChecked = document.getElementById(`${effect}Checkbox`).checked;
-
-        // Only create a button for checked effects
-        if (isChecked) {
+    // Create buttons for filtered effects
+    effects.forEach(effect => {
+        const checkbox = document.getElementById(`${effect}Checkbox`);
+        if (!checkbox || !checkbox.checked) return;
 
         const button = document.createElement('button');
         button.className = 'effect-button';
         button.textContent = effect;
         button.dataset.effect = effect;
         button.dataset.active = 'true';
-        button.addEventListener('mouseenter', () => displayEffectImages(effect));
-        button.addEventListener('click', () => { toggleEffect(button); displayEffectImages(effect); });
         
-        const checkboxDiv = document.querySelector(`.effect-control input[id="${effect}Checkbox"]`).closest('.effect-control');
+        // Check if effect matches search term
+        if (searchTerm && !effect.toLowerCase().includes(searchTerm)) {
+            button.style.display = 'none';
+        }
+
+        button.addEventListener('mouseenter', () => displayEffectImages(effect));
+        button.addEventListener('click', () => {
+            toggleEffect(button);
+            displayEffectImages(effect);
+        });
+
+        const checkboxDiv = checkbox.closest('.effect-control');
         checkboxDiv.insertAdjacentElement('afterend', button);
-    }
-
-
     });
 }
-
+function initializeEffectControls() {
+    const effectControls = document.getElementById('effectControls');
+    
+    effects.forEach(effect => {
+        const div = document.createElement('div');
+        div.className = 'effect-control';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `${effect}Checkbox`;
+        checkbox.checked = true;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `${effect}Checkbox`;
+        label.textContent = effect;
+        
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        effectControls.appendChild(div);
+    });
+}
 async function fastProcessImage(img, existingGeneratedImages = []) {
     processedImages = {};  
     const imageCount = parseInt(imageCountInput.value);
@@ -913,6 +998,32 @@ function displayProcessedImages() {
     //         }
     //     }
     // }
+
+}
+
+
+// Add the filter effects function
+function filterEffects(event) {
+    const searchTerm = event.target.value.toLowerCase();
+    const effectControls = document.getElementById('effectControls');
+    
+    effects.forEach(effect => {
+        const effectDiv = document.querySelector(`.effect-control:has(#${effect}Checkbox)`);
+        const effectButton = document.querySelector(`button[data-effect="${effect}"]`);
+        
+        if (!effectDiv) return;
+        
+        if (searchTerm === '') {
+            // Show all effects when search is empty
+            effectDiv.style.display = '';
+            if (effectButton) effectButton.style.display = '';
+        } else {
+            // Show/hide based on search match
+            const matches = effect.toLowerCase().includes(searchTerm);
+            effectDiv.style.display = matches ? '' : 'none';
+            if (effectButton) effectButton.style.display = matches ? '' : 'none';
+        }
+    });
 }
 
 

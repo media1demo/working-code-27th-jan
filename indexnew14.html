@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script async src="https://www.googletagmanager.com/gtag/js?id=G-87LBKLRFYV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-87LBKLRFYV');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Optimized Image Processing</title>
     <link rel="stylesheet" href="styles2.css">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
-    <script  src = "effects.js"></script>
-<script src = "removewatermark.js"></script>
-<script src = "objremovelipsync.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+    <script src = "effects.js"></script>
+    <script src = "removewatermark.js"></script>
+    <script src = "objremovelipsync.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
 </head>
 <body>
+    <div id="pricingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1100; justify-content: center; align-items: center;">
+        <div id="modalContent" style="background: #2a2a4f; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto; display: flex; gap: 20px; flex-wrap: nowrap; min-width: 80%;">
+            <!-- Content from pricing.html will be inserted here -->
+        </div>
+        <button id="closeModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
+    </div>
+    
     <div id="creditSystem">
         <div id="creditBalance">Credits: 0</div>
         <button id="buyCredits">Buy Credits</button>
         <button id="startFreeTrial">Start Free Trial</button>
     </div>
     <img id="sourceImage" crossorigin="anonymous" style="display: none;">
-    
     <div id="mainContainer" style="display: none;">
-        
     </div>
-    
     <canvas id="visualizationCanvas" style="display: none;"></canvas>
     <div id="imageDisplay" class="image-container"></div>
+    <div id="searchBarContainer">
+        <input type="text" id="effectSearchBar" placeholder="Search for effects...">
+    </div>
     <div id="sidebar">
-          <div class="timer-wrapper">
-                <div class="timer-container">
+        <button id = "magicWandTool" style="display: none;">.</button>
+     <button id="lassoTool">Lasso Tool</button>
+         <button id="polygonLassoTool">Polygon Lasso Tool</button> <!-- New button -->
+         <button id="circleMagicWandTool">Circle Magic Wand</button>
+        <div class="timer-wrapper">
+            <div class="timer-container">
                     <div class="digital-timer" id="timer">00:000</div>
                     <div class="timer-label"></div>
-                </div>
             </div>
+        </div>
+        
         <div class="controls" id = "side1barcontrols">
             <input type="file" id="imageUpload" accept="image/*">
             <label for="imageCount">Number of images per effect:</label>
             <input type="number" id="imageCount" min="1" max="100" value="">
             <button id="processButton">Process Image</button>
-            <!-- <button id="visualizeBtn">Visualize</button>
-            <button id="keypointsButton">Hand</button>
-            <button  id = "legButton" > Leg</button>
-            <button  id = "legButton1" > leftfoot</button>
-            <button  id = "legButton2" > rightfoot</button>
-            <button id = "leftlegonlyid">leftlegonlyid </button>
-            <button id = "rightlegonlyid">rightlegonlyid </button>
-            <button id ="rightarmonlyid">rightarmonlyid </button>
-            <button id ="leftarmonlyid">leftarmonlyid</button> -->
-            <select id="actionSelect" class="action-dropdown">
-               
+            <select id="actionSelect" class="action-dropdown">   
                 <option value="">Select Action</option>
                 <option value="visualizeBtn" id="visualizeBtn">Visualize</option>
                 <option value="visualizeBtn1" id="visualizeBtn1">Visualizesmall</option>
@@ -60,7 +69,6 @@
                 <option value="rightlegonlyid" id="rightlegonlyid">Right Leg Only</option>
                 <option value="rightarmonlyid" id="rightarmonlyid">Right Arm Only</option>
                 <option value="leftarmonlyid" id="leftarmonlyid">Left Arm Only</option>
-            
             </select>
             <div>
                 <label for="widthInput">Target Width:</label>
@@ -92,18 +100,12 @@
             <input type="checkbox" id="selectAllCheckbox">
             <label for="selectAllCheckbox">Select All Effects</label>
         </div>
-        
-        <!-- <div id="masterCheckboxControl">
-            <input type="checkbox" id="masterCheckbox" checked>
-            <label for="masterCheckbox">Select/Unselect All</label>
-        </div> -->
-        
     </div>
     <div id="masterCheckboxControl">
         <input type="checkbox" id="masterCheckbox" checked>
         <label for="masterCheckbox">Select/Unselect All</label>
     </div>
-    
+
     <div id="mainContent">
         <div id="imageContainer">
             <div class="image-wrapper" >
@@ -134,53 +136,29 @@
             </div>
         </div> -->
     </div>
+
     <div id="effectControls"></div>
-    
 <script src= "main.js"></script>
 <script>
+
 
 window.onload = () => {
     if (freeTrialInterval === null) {
         freeTrialInterval = setInterval(() => {
             credits += 2; // 2 credits every minute
             updateCreditBalance();
-        }, 60000); // 60000 milliseconds = 1 minute
+        }, 60000);
     }
 };
 
 let credits = 0;
 let freeTrialInterval = null;
 
-// document.getElementById('buyCredits').addEventListener('click', () => {
-//     credits += 10; // $1 gives 10 credits
-//     updateCreditBalance();
-// });
-
-// document.getElementById('startFreeTrial').addEventListener('click', () => {
-//     if (freeTrialInterval === null) {
-//         freeTrialInterval = setInterval(() => {
-//             credits += 10; // 10 credits every minute
-//             updateCreditBalance();
-//         }, 60000); // 60000 milliseconds = 1 minute
-//     }
-// });
-
 function updateCreditBalance() {
     document.getElementById('creditBalance').textContent = `Credits: ${credits}`;
     localStorage.setItem('credits', credits);
-
 }
 
-// function useCredits(amount) {
-//     if (credits >= amount) {
-//         credits -= amount;
-//         updateCreditBalance();
-//         return true;
-//     } else {
-//         alert('Not enough credits!');
-//         return false;
-//     }
-// }
 
 function useCredits() {
 
@@ -195,9 +173,8 @@ function useCredits() {
     const totalCreditsRequired = selectedEffects * imageCount;
 
     if (credits >= totalCreditsRequired) {
-        // console.log('credits :>> ', credits);
-        // console.log('totalCreditsRequired :>> ', totalCreditsRequired);
-
+      
+        
         credits -= totalCreditsRequired; // Deduct the total credits
         console.log('credits :>> ', credits);
         updateCreditBalance();
@@ -209,6 +186,10 @@ function useCredits() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    initializeEffectControls();
+
+    const effectSearchBar = document.getElementById('effectSearchBar');
+    effectSearchBar.addEventListener('input', filterEffects);
 
     credits = parseInt(localStorage.getItem('credits')) || 0;
     updateCreditBalance();
@@ -219,13 +200,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 60000); // 60000 milliseconds = 1 minute
     }
 
+
+    document.getElementById('buyCredits').addEventListener('click', () => {
+    // Show pricing modal
+    document.getElementById('pricingModal').style.display = 'flex';
     
-document.getElementById('buyCredits').addEventListener('click', () => {
-    credits += 10; // $1 gives 10 credits
-    updateCreditBalance();
+    // Load pricing content dynamically
+    fetch('pricing.html')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('modalContent').innerHTML = html;
+            
+            // Add event listeners to pricing buttons
+            document.querySelector('.basic button').addEventListener('click', function(e) {
+                e.preventDefault();
+                credits += 10000;
+                updateCreditBalance();
+                // window.open(this.getAttribute('href'), '_blank');
+                document.getElementById('pricingModal').style.display = 'none';
+            });
+            
+            document.querySelector('.standard button').addEventListener('click', function(e) {
+                e.preventDefault();
+                credits += 1000000;
+                updateCreditBalance();
+                // window.open(this.getAttribute('href'), '_blank');
+                document.getElementById('pricingModal').style.display = 'none';
+            });
+        });
+    }); 
+
+
+    document.getElementById('closeModal').addEventListener('click', function () {
+    const pricingModal = document.getElementById('pricingModal');
+    pricingModal.style.display = 'none';
 });
 
-document.getElementById('startFreeTrial').addEventListener('click', () => {
+
+    document.getElementById('pricingModal').addEventListener('click', function (event) {
+    if (event.target === this) {
+        this.style.display = 'none';
+    }
+});
+
+    document.getElementById('startFreeTrial').addEventListener('click', () => {
     if (freeTrialInterval === null) {
         freeTrialInterval = setInterval(() => {
             credits += 10; // 10 credits every minute
@@ -233,6 +251,7 @@ document.getElementById('startFreeTrial').addEventListener('click', () => {
         }, 60000); // 60000 milliseconds = 1 minute
     }
 });
+
 
     document.getElementById('imageUpload').addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -250,14 +269,13 @@ document.getElementById('startFreeTrial').addEventListener('click', () => {
         reader.readAsDataURL(file);
     });
 
-
     const actionSelect = document.getElementById('actionSelect');
 
-// Add a change event listener to handle all actions
-actionSelect.addEventListener('change', function(e) {
+    // Add a change event listener to handle all actions
+    actionSelect.addEventListener('change', function(e) {
     // Get the selected value
     const selectedAction = e.target.value;
-    
+
     // Handle each action based on the selected value
     switch(selectedAction) {
         case 'visualizeBtn':
@@ -291,9 +309,9 @@ actionSelect.addEventListener('change', function(e) {
             leftarmonly();
             break;
     }
-});
+    });
 
-});
+    });
 
 
 
@@ -351,26 +369,12 @@ function processSegmentVariations(imageData, partName) {
 }
 
 
-document.getElementById('imageUpload').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-        const img = document.getElementById('sourceImage');
-        img.src = e.target.result;
-        img.onload = async () => {
-            await loadModels();
-            await prepareSegmentation();
-        };
-    };
-    
-    reader.readAsDataURL(file);
-});
+
 document.getElementById('visualizeBtn1').addEventListener('click', () => {
     
 
-    console.log("visual button clicked");
-    startProcessing1('visualize');});
+console.log("visual button clicked");
+startProcessing1('visualize');});
 
 document.getElementById('visualizeBtn').addEventListener('click', () => {startProcessing('visualize');});
 document.getElementById('keypointsButton').addEventListener('click', handcode);
@@ -386,6 +390,7 @@ document.getElementById('leftarmonlyid').addEventListener('click', leftarmonly);
 async function prepareSegmentation() {
     const img = document.getElementById('sourceImage');
     segmentationResult = await net.segmentPersonParts(img);
+    // alert(segmentationResult)
 }
 
 const segmentationWorker = new Worker('keypoints-worker.js');
@@ -593,7 +598,7 @@ function attemptCombination() {
     }
 }
 
-// Overwrite the `push` method of the generatedImages array to trigger combination checks dynamically
+
 const originalPush = generatedImages.push;
 generatedImages.push = function (...args) {
     originalPush.apply(this, args);
@@ -3657,6 +3662,7 @@ Promise.allSettled(
                             wrapper: wrapper,
                             image: img
                         });
+
                     });
 
                     // Start animation when all workers are done
@@ -5367,42 +5373,155 @@ Promise.allSettled(
     console.error('Overall worker processing error:', error);
 });
 
-// Modified sequential animation function for continuous animation
-function startSequentialAnimation() {
-    let currentIndex = 0;
+
+
+// function startSequentialAnimation() {
+//     let currentIndex = 0;
     
-    // First hide all images
-    generatedImages.forEach(item => {
-        item.wrapper.classList.remove('active');
-    });
+//     // First hide all images
+//     generatedImages.forEach(item => {
+//         item.wrapper.classList.remove('active');
+//     });
 
-    function showNextImage() {
-        // Hide current image
-        if (currentIndex > 0) {
-            generatedImages[currentIndex - 1].wrapper.classList.remove('active');
-        } else {
-            // When starting a new cycle, hide the last image
-            generatedImages[generatedImages.length - 1].wrapper.classList.remove('active');
-        }
+//     function showNextImage() {
+//         // Hide current image
+//         if (currentIndex > 0) {
+//             generatedImages[currentIndex - 1].wrapper.classList.remove('active');
+//         } else {
+//             // When starting a new cycle, hide the last image
+//             generatedImages[generatedImages.length - 1].wrapper.classList.remove('active');
+//         }
 
-        // Show next image
-        generatedImages[currentIndex].wrapper.classList.add('active');
+//         // Show next image
+//         generatedImages[currentIndex].wrapper.classList.add('active');
 
-        // Increment counter
-        currentIndex = (currentIndex + 1) % generatedImages.length;
+//         // Increment counter
+//         currentIndex = (currentIndex + 1) % generatedImages.length;
 
-        // Schedule next image - animation continues indefinitely
-        setTimeout(showNextImage, 200);
-    }
+//         // Schedule next image - animation continues indefinitely
+//         setTimeout(showNextImage, 200);
+//     }
 
-    // Start the sequence
-    showNextImage();
-}
+//     // Start the sequence
+//     showNextImage();
+// }
 
 
 
 
 // Helper function to create an image from ImageData
+
+
+function startSequentialAnimation() {
+    // Create a canvas for combining images
+    const combinedCanvas = document.createElement('canvas');
+    const ctx = combinedCanvas.getContext('2d');
+    
+    // Set canvas dimensions based on original image size
+    combinedCanvas.width = generatedImages[0].image.width;
+    combinedCanvas.height = generatedImages[0].image.height;
+    
+    // Group images by type
+    const handImages = generatedImages.filter(img => img.type === 'hand');
+    const legImages = generatedImages.filter(img => img.type === 'leg');
+    
+    // Create wrapper for combined images
+    const combinedWrapper = document.createElement('div');
+    combinedWrapper.className = 'image-wrapper active';
+    imageContainer.appendChild(combinedWrapper);
+    
+    function combineAndShowImages(handIndex = 0, legIndex = 0) {
+        // Clear canvas
+        ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+        
+        // Draw hand image
+        if (handImages[handIndex]) {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(handImages[handIndex].image, 0, 0);
+        }
+        
+        // Draw leg image
+        if (legImages[legIndex]) {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(legImages[legIndex].image, 0, 0);
+        }
+        
+        // Create combined image
+        const combinedImage = new Image();
+        combinedImage.src = combinedCanvas.toDataURL();
+        
+        // Update display
+        combinedWrapper.innerHTML = '';
+        combinedWrapper.appendChild(combinedImage);
+        
+        // Schedule next combination if needed
+        setTimeout(() => {
+            const nextHandIndex = (handIndex + 1) % handImages.length;
+            const nextLegIndex = (legIndex + 1) % legImages.length;
+            combineAndShowImages(nextHandIndex, nextLegIndex);
+        }, 200);
+    }
+    
+    // Start the combination process
+    combineAndShowImages();
+}
+
+
+
+// Update the worker processing section
+Promise.allSettled(
+    workersToUse.map(({ worker }, index) =>
+        new Promise((resolve, reject) => {
+            worker.onmessage = (e) => {
+                if (e.data.type === 'processedVariations') {
+                    if (!e.data.variations || e.data.variations.length === 0) {
+                        console.warn(`No variations for ${workersToUse[index].type} worker`);
+                        return;
+                    }
+
+                    workersToUse[index].variations = e.data.variations;
+
+                    e.data.variations.forEach((variation, variationIndex) => {
+                        const img = new Image();
+                        img.src = variation.imageUrl || createImageFromData(
+                            variation.imageData,
+                            variation.width,
+                            variation.height
+                        );
+
+                        generatedImages.push({
+                            index: variationIndex,
+                            type: workersToUse[index].type,
+                            image: img,
+                            width: variation.width,
+                            height: variation.height
+                        });
+                    });
+
+                    // Start animation when all workers are done
+                    if (generatedImages.length === totalworkerimages) {
+                        startSequentialAnimation();
+                    }
+
+                    resolve({
+                        type: workersToUse[index].type,
+                        variations: e.data.variations
+                    });
+                }
+            };
+
+            worker.onerror = (error) => {
+                console.error('Worker error:', error);
+                reject(error);
+            };
+
+            worker.postMessage(workerMessages[index]);
+        })
+    )
+).catch(error => {
+    console.error('Overall worker processing error:', error);
+});
+
 function createImageFromData(imageData, width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -5441,7 +5560,8 @@ async function processImageWithOverlay1(processType) {
         if (!partName) continue;
         if (!segmentation.data.includes(partId)) {
 
-            continue; // Skip processing if part is not present
+            continue; 
+
         }
 
         const segmentCanvas = document.createElement('canvas');
@@ -5651,8 +5771,8 @@ generatedImages.push = function (...args) {
     originalPush.apply(this, args);
     attemptCombination(); // Check if combinations can be processed
 };
-console.log('generatedImages :>> ', generatedImages);
 
+console.log('generatedImages :>> ', generatedImages);
 
 function safelyCombineImages(img1, img2) {
     return new Promise((resolve, reject) => {
@@ -5758,66 +5878,6 @@ function combineImagesByIndexes(index1, index2) {
 
     }
 
-// Worker processing remains unchanged
-// Promise.allSettled(
-//     workersToUse.map(({ worker }, index) =>
-//         new Promise((resolve, reject) => {
-//             worker.onmessage = (e) => {
-//                 if (e.data.type === 'processedVariations') {
-//                     if (!e.data.variations || e.data.variations.length === 0) {
-//                         console.warn(`No variations for ${workersToUse[index].type} worker`);
-//                         return;
-//                     }
-
-//                     workersToUse[index].variations = e.data.variations;
-
-//                     e.data.variations.forEach((variation, variationIndex) => {
-//                         const img = document.createElement('img');
-//                         img.src = variation.imageUrl || createImageFromData(
-//                             variation.imageData,
-//                             variation.width,
-//                             variation.height
-//                         );
-
-//                         const wrapper = document.createElement('div');
-//                         wrapper.className = 'image-wrapper';
-
-//                         wrapper.appendChild(img);
-
-//                         const container = document.getElementById('imageContainer');
-//                         container.appendChild(wrapper);
-//                         // console.log(workersToUse[index].type);
-//                         generatedImages.push({
-//                             index: variationIndex,
-//                             type: workersToUse[index].type,
-//                             image: img,
-//                             imageUrl: variation.imageUrl,
-//                             imageData: variation.imageData,
-//                             width: variation.width,
-//                             height: variation.height
-//                         });
-//                         // console.log('generatedImages :>> ', generatedImages);
-//                     });
-
-//                     resolve({
-//                         type: workersToUse[index].type,
-//                         variations: e.data.variations
-//                     });
-//                 }
-//             };
-
-//             worker.onerror = (error) => {
-//                 console.error('Worker error:', error);
-//                 reject(error);
-//             };
-
-//             worker.postMessage(workerMessages[index]);
-//         })
-//     )
-// ).catch(error => {
-//     console.error('Overall worker processing error:', error);
-// });
-
 const imageContainer = document.getElementById('imageContainer');
 imageContainer.innerHTML = ''; // Clear existing content
 imageContainer.style.position = 'relative';
@@ -5915,39 +5975,145 @@ Promise.allSettled(
     console.error('Overall worker processing error:', error);
 });
 
-// Modified sequential animation function for continuous animation
-function startSequentialAnimation() {
-    let currentIndex = 0;
+// // Modified sequential animation function for continuous animation
+// function startSequentialAnimation() {
+//     let currentIndex = 0;
     
-    // First hide all images
-    generatedImages.forEach(item => {
-        item.wrapper.classList.remove('active');
-    });
+//     // First hide all images
+//     generatedImages.forEach(item => {
+//         item.wrapper.classList.remove('active');
+//     });
 
-    function showNextImage() {
-        // Hide current image
-        if (currentIndex > 0) {
-            generatedImages[currentIndex - 1].wrapper.classList.remove('active');
-        } else {
-            // When starting a new cycle, hide the last image
-            generatedImages[generatedImages.length - 1].wrapper.classList.remove('active');
+//     function showNextImage() {
+//         // Hide current image
+//         if (currentIndex > 0) {
+//             generatedImages[currentIndex - 1].wrapper.classList.remove('active');
+//         } else {
+//             // When starting a new cycle, hide the last image
+//             generatedImages[generatedImages.length - 1].wrapper.classList.remove('active');
+//         }
+
+//         // Show next image
+//         generatedImages[currentIndex].wrapper.classList.add('active');
+
+//         // Increment counter
+//         currentIndex = (currentIndex + 1) % generatedImages.length;
+
+//         // Schedule next image - animation continues indefinitely
+//         setTimeout(showNextImage, 200);
+//     }
+
+//     // Start the sequence
+//     showNextImage();
+// }
+
+function startSequentialAnimation() {
+    // Create a canvas for combining images
+    const combinedCanvas = document.createElement('canvas');
+    const ctx = combinedCanvas.getContext('2d');
+    
+    // Set canvas dimensions based on original image size
+    combinedCanvas.width = generatedImages[0].image.width;
+    combinedCanvas.height = generatedImages[0].image.height;
+    
+    // Group images by type
+    const handImages = generatedImages.filter(img => img.type === 'hand');
+    const legImages = generatedImages.filter(img => img.type === 'leg');
+    
+    // Create wrapper for combined images
+    const combinedWrapper = document.createElement('div');
+    combinedWrapper.className = 'image-wrapper active';
+    imageContainer.appendChild(combinedWrapper);
+    
+    function combineAndShowImages(handIndex = 0, legIndex = 0) {
+        // Clear canvas
+        ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+        
+        // Draw hand image
+        if (handImages[handIndex]) {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(handImages[handIndex].image, 0, 0);
         }
-
-        // Show next image
-        generatedImages[currentIndex].wrapper.classList.add('active');
-
-        // Increment counter
-        currentIndex = (currentIndex + 1) % generatedImages.length;
-
-        // Schedule next image - animation continues indefinitely
-        setTimeout(showNextImage, 200);
+        
+        // Draw leg image
+        if (legImages[legIndex]) {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(legImages[legIndex].image, 0, 0);
+        }
+        
+        // Create combined image
+        const combinedImage = new Image();
+        combinedImage.src = combinedCanvas.toDataURL();
+        
+        // Update display
+        combinedWrapper.innerHTML = '';
+        combinedWrapper.appendChild(combinedImage);
+        
+        // Schedule next combination if needed
+        setTimeout(() => {
+            const nextHandIndex = (handIndex + 1) % handImages.length;
+            const nextLegIndex = (legIndex + 1) % legImages.length;
+            combineAndShowImages(nextHandIndex, nextLegIndex);
+        }, 200);
     }
-
-    // Start the sequence
-    showNextImage();
+    
+    // Start the combination process
+    combineAndShowImages();
 }
 
+// Update the worker processing section
+Promise.allSettled(
+    workersToUse.map(({ worker }, index) =>
+        new Promise((resolve, reject) => {
+            worker.onmessage = (e) => {
+                if (e.data.type === 'processedVariations') {
+                    if (!e.data.variations || e.data.variations.length === 0) {
+                        console.warn(`No variations for ${workersToUse[index].type} worker`);
+                        return;
+                    }
 
+                    workersToUse[index].variations = e.data.variations;
+
+                    e.data.variations.forEach((variation, variationIndex) => {
+                        const img = new Image();
+                        img.src = variation.imageUrl || createImageFromData(
+                            variation.imageData,
+                            variation.width,
+                            variation.height
+                        );
+
+                        generatedImages.push({
+                            index: variationIndex,
+                            type: workersToUse[index].type,
+                            image: img,
+                            width: variation.width,
+                            height: variation.height
+                        });
+                    });
+
+                    // Start animation when all workers are done
+                    if (generatedImages.length === totalworkerimages) {
+                        startSequentialAnimation();
+                    }
+
+                    resolve({
+                        type: workersToUse[index].type,
+                        variations: e.data.variations
+                    });
+                }
+            };
+
+            worker.onerror = (error) => {
+                console.error('Worker error:', error);
+                reject(error);
+            };
+
+            worker.postMessage(workerMessages[index]);
+        })
+    )
+).catch(error => {
+    console.error('Overall worker processing error:', error);
+});
 
 
 // Helper function to create an image from ImageData
@@ -5955,7 +6121,9 @@ function createImageFromData(imageData, width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
+    // const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
     ctx.putImageData(new ImageData(imageData, width, height), 0, 0);
     return canvas.toDataURL();
 }
@@ -5992,6 +6160,118 @@ function createImageFromData(imageData, width, height) {
             effectControls.appendChild(controlDiv);
         }); 
 
+        function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set the desired maximum width and height
+            const MAX_DIMENSION = 800; // Maximum allowed dimension (width or height)
+            let width = img.width;
+            let height = img.height;
+
+            // Check if either width or height exceeds the maximum dimension
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                if (width > height) {
+                    // Resize based on width
+                    height *= MAX_DIMENSION / width;
+                    width = MAX_DIMENSION;
+                } else {
+                    // Resize based on height
+                    width *= MAX_DIMENSION / height;
+                    height = MAX_DIMENSION;
+                }
+            }
+
+            // Set canvas dimensions
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw the image on the canvas with the new dimensions
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert the canvas content to a data URL with reduced quality
+            canvas.toBlob((blob) => {
+                callback(blob);
+            }, 'image/jpeg', 0.7); // Adjust the quality (0.7 means 70% quality)
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+
+        
+        // document.getElementById('imageUpload').addEventListener('change', (event) => {
+        //     const file = event.target.files[0];
+        //     if (file) {
+        //         const reader = new FileReader();
+        //         reader.onload = (e) => {
+        //             const img = new Image();
+        //             img.onload = () => {
+        //                 // Check if either width or height exceeds 800px
+        //                 console.log(img.width);
+        //                 console.log(img.height);
+        //                 if (img.width > 600 || img.height > 600) {
+        //                     // Compress the image
+        //                     compressImage(file, (compressedBlob) => {
+        //                         const compressedReader = new FileReader();
+        //                         compressedReader.onload = (e) => {
+        //                             originalImage = new Image();
+        //                             originalImage.onload = () => {
+        //                                 imageCanvas.width = originalImage.width;
+        //                                 imageCanvas.height = originalImage.height;
+        //                                 ctx.drawImage(originalImage, 0, 0);
+        //                                 originalImageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+        //                                 maskData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height); // Initialize maskData
+        //                                 size = { w: imageCanvas.width, h: imageCanvas.height }; // Initialize size
+        //                                 objectMask = matrix(imageCanvas.width, imageCanvas.height, false); // Initialize objectMask
+        //                             };
+        //                             originalImage.onerror = (error) => {
+        //                                 console.error('Error loading image:', error);
+        //                                 alert('Failed to load the image. Please try again.');
+        //                             };
+        //                             originalImage.src = e.target.result; // Load the compressed image into the canvas
+        //                         };
+        //                         compressedReader.onerror = (error) => {
+        //                             console.error('Error reading compressed file:', error);
+        //                             alert('Failed to read the compressed file. Please try again.');
+        //                         };
+        //                         compressedReader.readAsDataURL(compressedBlob); // Read the compressed blob as a data URL
+        //                     });
+        //                 } else {
+        //                     // If dimensions are within limits, load the image directly
+        //                     originalImage = new Image();
+        //                     originalImage.onload = () => {
+        //                         imageCanvas.width = originalImage.width;
+        //                         imageCanvas.height = originalImage.height;
+        //                         ctx.drawImage(originalImage, 0, 0);
+        //                         originalImageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+        //                         maskData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height); // Initialize maskData
+        //                         size = { w: imageCanvas.width, h: imageCanvas.height }; // Initialize size
+        //                         objectMask = matrix(imageCanvas.width, imageCanvas.height, false); // Initialize objectMask
+        //                     };
+        //                     originalImage.onerror = (error) => {
+        //                         console.error('Error loading image:', error);
+        //                         alert('Failed to load the image. Please try again.');
+        //                     };
+        //                     originalImage.src = e.target.result; // Load the image into the canvas
+        //                 }
+        //             };
+        //             img.src = e.target.result;
+        //         };
+        //         reader.onerror = (error) => {
+        //             console.error('Error reading file:', error);
+        //             alert('Failed to read the file. Please try again.');
+        //         };
+        //         reader.readAsDataURL(file); // Read the file as a data URL
+        //     }
+        // });
+
+
         imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -6002,7 +6282,9 @@ function createImageFromData(imageData, width, height) {
                         imageCanvas.width = originalImage.width;
                         imageCanvas.height = originalImage.height;
                         imageCanvas.id = "icid"
+                        
                         ctx.drawImage(originalImage, 0, 0);
+                        
                         originalImageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
                         maskData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height); // Initialize maskData
                         size = { w: imageCanvas.width, h: imageCanvas.height }; // Initialize size
@@ -6023,6 +6305,7 @@ function createImageFromData(imageData, width, height) {
             }
         });
 
+        
         function loadImage() {
             originalImage = new Image();
             originalImage.onload = function() {
@@ -6042,6 +6325,7 @@ function createImageFromData(imageData, width, height) {
             // originalImage.src = 'face.jpg'; // Ensure this path is correct
 
         }
+
 
         </script>
 </body>

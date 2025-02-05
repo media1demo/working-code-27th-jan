@@ -37,17 +37,72 @@
     background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
+#actionSelect, .action-dropdown {
+    width: 100% !important;
+    padding: 12px !important;
+    background-color: #1e1e2f !important;
+    color: white !important;
+    border: 1px solid #3a3a5f !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    margin: 10px 0 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    position: relative !important;
+}
+
+/* Dropdown options */
+#actionSelect option {
+    background-color: #1e1e2f !important;
+    color: white !important;
+    padding: 12px !important;
+    border: none !important;
+}
+
+/* Active state */
+#actionSelect:focus {
+    outline: none !important;
+    border-color: #3498db !important;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.5) !important;
+}
+
+/* Selected option */
+#actionSelect option:checked {
+    background-color: #3498db !important;
+}
+
+/* Custom arrow */
+#actionSelect {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 12px !important;
+    padding-right: 30px !important;
+}
+
+/* Container adjustments */
+.controls {
+    padding: 10px !important;
+}
+
+/* Hover effect */
+#actionSelect:hover {
+    background-color: #2a2a4f !important;
+}
 
 body {
     display: flex;
     height: 100vh;
     font-family: 'Roboto', sans-serif;
     line-height: 1.6;
-    background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+    /* background: linear-gradient(135deg, #f4f4f4, #e0e0e0); */
+    background: linear-gradient(135deg, #0a0a0f, #1a1a2f) !important;
+    /* color: #e0e0e0 !important; */
     overflow-x: hidden;
 }
 
-/* Sidebar with your existing styles plus scrollbar */
 #sidebar {
     width: 300px;
     background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
@@ -68,7 +123,7 @@ body {
 /* Effect Controls - Floating Panel */
 #effectControls {
     position: fixed;
-    top: 0;
+    top: 100px !important;
     right: 0;
     width: 350px;
     height: 120%;
@@ -327,7 +382,10 @@ body {
     
     margin-left: 320px;
     padding: 30px;
-    background: rgba(255, 255, 255, 0.9);
+    /* background: rgba(255, 255, 255, 0.9); */
+    background: rgba(30, 30, 47, 0.95) !important;
+    color: #ddd !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5) !important;
     border-radius: 15px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: margin-left 0.3s ease;
@@ -348,12 +406,81 @@ body {
 .image-wrapper {
     flex: 1 1 auto; /* Allow items to shrink or grow as needed */
     text-align: center;
-    background: #fff;
+    /* background: #fff; */
+    background: #2a2a4f !important;
+    /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important; */
+
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
     transition: transform 0.3s ease;
 }
+
+
+.lasso-active {
+    cursor: crosshair !important;
+}
+
+#polygonLassoTool.active,
+#lassoTool.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.rectangle-active {
+    cursor: crosshair !important;
+}
+
+#polygonLassoTool.active {
+    background-color: #007bff;
+    color: white;
+}
+
+
+.tools-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 5px;
+}
+
+.tool-button {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tool-button:hover {
+    background: #f0f0f0;
+}
+
+.tool-button.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.imageCanvas {
+    cursor: default;
+}
+
+.imageCanvas.tool-active {
+    cursor: crosshair;
+}
+
+#circleMagicWandTool.active {
+    background-color: #007bff;
+    color: white;
+}
+
+
 @media (max-width: 768px) {
     #sidebar {
         width: 100%;
@@ -566,7 +693,7 @@ body {
     background: #fff;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
     transition: transform 0.3s ease;
 }
 
@@ -585,7 +712,7 @@ body {
     max-width: 100%; /* Ensure images do not exceed container width */
     height: auto; /* Maintain aspect ratio */
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
 }
 
 /* Responsive Design for Vertical Stacking */
@@ -612,8 +739,14 @@ body {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
+
 
 /* Canvas */
 canvas {
@@ -625,20 +758,63 @@ canvas {
 
 /* Position the master checkbox on the right-hand side */
 
-/* Master Checkbox Control Styling */
+
 #masterCheckboxControl {
     position: fixed;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
+width: 350px;
     top: 0px;
-    right: 155px;
+    right: 0;
     z-index: 1000;
-    /* background: rgba(30, 30, 47, 0.8); */
     backdrop-filter: blur(10px);
     padding: 15px 20px;
-    /* border: 1px solid rgba(255, 255, 255, 0.1); */
     border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+/* Styling for the right side - Search Bar */
+#searchBarContainer {
+    position: fixed;
+    background: linear-gradient(135deg, #1e1e2f, #3a3a5f);
+width: 350px !important;
+    top: 40px;
+    right: 0px;  /* Positions search bar on the right */
+    z-index: 1000;
+    width: 300px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+/* Search Bar Input */
+#effectSearchBar {
+    /* appearance: none; */
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    font-size: 14px;
+    color: #ddd;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#effectSearchBar::placeholder {
+    color: #999;
+}
+
+#effectSearchBar:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+#effectSearchBar:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 #masterCheckboxControl input[type="checkbox"] {
@@ -650,6 +826,20 @@ canvas {
     cursor: pointer;
     transition: background 0.3s ease;
     margin-right: 8px;
+}
+
+
+.lasso-active {
+    cursor: crosshair !important;
+}
+
+.imageCanvas.lasso-active {
+    border: 2px dashed yellow;
+}
+
+#polygonLassoButton.active {
+    background-color: #ffeb3b;
+    color: black;
 }
 
 #masterCheckboxControl input[type="checkbox"]:checked {
@@ -702,6 +892,7 @@ canvas {
     margin-right: 10px;
 }
 
+
 #effectControls button {
     /* background-color: #4CAF50; */
     /* background: #0056b3; */
@@ -712,9 +903,29 @@ canvas {
     transition: background-color 0.3s ease;
 }
 
+.canvas-wrapper {
+    display: inline-block;
+    max-width: 300px;
+    margin: 10px;
+    text-align: center;
+    background: #fff;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.canvas-wrapper img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    object-fit: contain;
+}
 
 /* Canvas Wrapper - Modern Styling */
-.canvas-wrapper {
+/* .canvas-wrapper {
     display: inline-block;
     width: 300px;
     height: 300px;
@@ -725,19 +936,19 @@ canvas {
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+} */
 
 .canvas-wrapper:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
-
+/* 
 .canvas-wrapper img {
     width: 100%;
     height: 100%;
     border-radius: 10px;
     object-fit: cover;
-}
+} */
 
     .canvas-wrapper {display: inline-block; 
         width: 300px;
@@ -752,10 +963,10 @@ canvas {
     width: 100px;
     height: 100px;
 } */
-.canvas-wrapper img{
+/* .canvas-wrapper img{
     width: 300px;
     height: 300px;
-}
+} */
 
 #effectControls button:hover {
     /* background-color: #45a049; */

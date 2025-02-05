@@ -390,7 +390,7 @@ document.getElementById('leftarmonlyid').addEventListener('click', leftarmonly);
 async function prepareSegmentation() {
     const img = document.getElementById('sourceImage');
     segmentationResult = await net.segmentPersonParts(img);
-    alert(segmentationResult)
+    // alert(segmentationResult)
 }
 
 const segmentationWorker = new Worker('keypoints-worker.js');

@@ -204,10 +204,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 60000); // 60000 milliseconds = 1 minute
     }
 
-document.getElementById('investorRelations').addEventListener('click', function() {
-    window.open('banner.html', '_blank');
-});
+  const iframe = document.querySelector('iframe');
     
+    if (iframe) {
+        // Load the banner.html URL into the existing iframe
+        iframe.src = 'https://tejas36026.github.io/working-code-27th-jan/banner.html';
+    } else {
+        // Fallback if no iframe is found
+        console.error('No iframe found in the document');
+        window.open('https://tejas36026.github.io/working-code-27th-jan/banner.html', '_blank');
+    }
     document.getElementById('buyCredits').addEventListener('click', () => {
     // Show pricing modal
     document.getElementById('pricingModal').style.display = 'flex';

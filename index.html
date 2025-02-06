@@ -204,7 +204,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 60000); // 60000 milliseconds = 1 minute
     }
 
-  const iframe = document.querySelector('iframe');
+ document.getElementById('investorRelations').addEventListener('click', function() {
+    // Find the iframe in your document
+    const iframe = document.querySelector('iframe');
     
     if (iframe) {
         // Load the banner.html URL into the existing iframe
@@ -214,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('No iframe found in the document');
         window.open('https://tejas36026.github.io/working-code-27th-jan/banner.html', '_blank');
     }
+});
     document.getElementById('buyCredits').addEventListener('click', () => {
     // Show pricing modal
     document.getElementById('pricingModal').style.display = 'flex';

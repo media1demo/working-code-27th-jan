@@ -3,6 +3,37 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+
+.top-centered-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    z-index: 1000;
+    pointer-events: none; /* Allows clicking through the container */
+}
+
+.centered-button {
+    background-color: rgba(33, 150, 243, 0.2); /* Blue with 20% opacity */
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    pointer-events: auto; /* Re-enables clicking on the button */
+}
+
+.centered-button:hover {
+    background-color: rgba(33, 150, 243, 0.3); /* Slightly more opaque on hover */
+}
+
 #creditSystem {
     position: fixed;
     bottom: 20px;

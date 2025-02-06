@@ -204,19 +204,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 60000); // 60000 milliseconds = 1 minute
     }
 
- document.getElementById('investorRelations').addEventListener('click', function() {
-    // Find the iframe in your document
+    const investorRelationsBtn = document.getElementById('investorRelations');
+    
+    // Select the iframe
     const iframe = document.querySelector('iframe');
     
-    if (iframe) {
-        // Load the banner.html URL into the existing iframe
-        iframe.src = 'https://tejas36026.github.io/working-code-27th-jan/banner.html';
+    // Store the original source
+    const originalSrc = 'https://tejas36026.github.io/working-code-27th-jan/';
+    const bannerSrc = 'https://tejas36026.github.io/working-code-27th-jan/banner.html';
+
+    // Add click event listener to the Investor Relations button
+    if (investorRelationsBtn && iframe) {
+        investorRelationsBtn.addEventListener('click', function() {
+            // Check current source and toggle
+            if (iframe.src === originalSrc) {
+                iframe.src = bannerSrc;
+            } else {
+                iframe.src = originalSrc;
+            }
+        });
     } else {
-        // Fallback if no iframe is found
-        console.error('No iframe found in the document');
-        window.open('https://tejas36026.github.io/working-code-27th-jan/banner.html', '_blank');
+        console.error('Investor Relations button or iframe not found');
     }
-});
+
     document.getElementById('buyCredits').addEventListener('click', () => {
     // Show pricing modal
     document.getElementById('pricingModal').style.display = 'flex';

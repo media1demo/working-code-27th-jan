@@ -209,6 +209,9 @@ body {
     color: #fff;
 }
 
+
+
+
 #effectControls .controls {
     display: flex;
     flex-direction: column;
@@ -359,24 +362,24 @@ body {
 
 
 
-#effectControls {display: flex; flex-direction: column; gap: 1px;}
-
-
-/* Effect Controls - Floating Panel */
+    
 #effectControls {
     position: fixed;
     top: 0;
     right: 0;
     width: 350px;
     height: 100%;
-    background: rgba(30, 30, 47, 0.8); /* Semi-transparent dark background */
-    backdrop-filter: blur(10px); /* Glass blur effect */
+    background: rgba(30, 30, 47, 0.8); 
+    backdrop-filter: blur(10px); 
     padding: 20px;
     box-sizing: border-box;
+
     overflow-y: auto;
     border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
     z-index: 100;
-}
+} */
+
+
 #mainContent {flex-grow: 1; padding: 20px; overflow-y: auto;}
 #mainContent {
     
@@ -591,7 +594,7 @@ body {
     background: #007bff;
 }
 
-#effectControls {
+/* #effectControls {
     position: fixed;
     top: 0;
     right: 0;
@@ -603,7 +606,7 @@ body {
     overflow-y: auto;
     border-left: 1px solid #ddd;
     z-index: 100;
-}
+} */
 
 #effectControls .controls {
     display: flex;
@@ -630,7 +633,7 @@ body {
     margin-right: 10px;
 }
 
-
+/* 
 #effectControls {
     position: fixed;
     top: 0;
@@ -643,7 +646,9 @@ body {
     overflow-y: auto;
     border-left: 1px solid #ddd;
     z-index: 100;
-}
+} */
+
+
 #imageCanvas { border: 1px solid black; }
 #generatedImages img { max-width: 1000px; margin: 5px; }
 #generatedImages {
@@ -1061,4 +1066,18 @@ canvas,
     text-transform: uppercase;
     letter-spacing: 1px;
     font-family: monospace;
+}
+
+
+
+#effectControls::-webkit-scrollbar {
+    width: 7px;
+    background: transparent;
+}
+
+#effectControls::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    min-height: 50px; /* Increase the height of the scrollbar thumb */
+
 }

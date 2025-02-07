@@ -50,8 +50,13 @@
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 1.7rem;
             color: #1e3c72;
+            cursor: pointer;
+        }
+
+        h1:hover {
+            text-decoration: underline;
         }
 
         h2 {
@@ -92,13 +97,13 @@
         }
 
         .metric h3 {
-            font-size: 1.2rem;
+            font-size: 2.2rem;
             color: #2a5298;
             margin-bottom: 5px;
         }
 
         .metric p {
-            font-size: 0.9rem;
+            font-size: 1.0rem;
             color: #666;
         }
 
@@ -128,18 +133,17 @@
         .video-container video {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Changed from 'cover' to 'contain' */
+            object-fit: contain;
             position: absolute;
             top: 0;
             left: 0;
-            background: #c7d2fe; /* Added background color to video element */
+            background: #c7d2fe;
         }
 
-        /* Add aspect ratio container to maintain video proportions */
         .video-wrapper {
             width: 100%;
             position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
         }
 
         .video-wrapper video {
@@ -175,32 +179,29 @@
             }
 
             h1 {
-                font-size: 2rem;
+                font-size: 1.4rem;
             }
         }
 
-        .hamburger {
+        .sample-videos-btn {
             cursor: pointer;
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1000;
-            /* background: #1e3c72; */
-            background:  #2a5298;
-            padding: 10px;
+            background: #2a5298;
+            padding: 10px 20px;
             border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            transition: background 0.3s ease;
         }
 
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background: white;
-            margin: 5px 0;
-            transition: 0.4s;
+        .sample-videos-btn:hover {
+            background: #1e3c72;
         }
 
-        /* Video Grid Container */
         .video-section {
             display: none;
             position: fixed;
@@ -218,7 +219,6 @@
             display: block;
         }
 
-        /* Enhanced Video Grid */
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -275,46 +275,12 @@
             transform: translateY(0);
         }
 
-        /* Hamburger Button */
-        .hamburger {
-            cursor: pointer;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background: white;
-            margin: 5px 0;
-            transition: 0.4s;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
-
         .close-grid {
             position: fixed;
             top: 20px;
             right: 20px;
             color: white;
-            /* background: #1e3c72; */
-            background:    #2a5298;
+            background: #2a5298;
             border: none;
             padding: 10px 15px;
             border-radius: 5px;
@@ -323,7 +289,6 @@
             font-size: 18px;
         }
 
-        /* Media Queries */
         @media (max-width: 1024px) {
             .video-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -357,7 +322,7 @@
 <body>
     <div class="banner">
         <div class="left-column">
-            <h1>Creating Animation with Zero GPU Dependency</h1>
+            <h1 onclick="window.open('https://pixel2.glitch.me/', '_blank')">Creating Animation with Zero Dependency</h1>
             <h2>Lightweight, Fast</h2>
             <p>
                 We convert images into high-quality animation using code
@@ -372,7 +337,11 @@
             </p>
         </div>
         <div class="right-column">
-            <h2>Visual Demo</h2>
+
+            <h1 onclick="window.open('https://pixel2.glitch.me/', '_blank')">Click Here for Visual Demo
+            
+            </h1>
+            <!-- <h2>Click Here for Visual Demo</h2> -->
             <p>(Image-to-Animation Conversion)</p>
             <div class="video-container">
                 <video autoplay loop muted playsinline controls>
@@ -381,22 +350,11 @@
                 </video>
             </div>
         </div>
-        <div class="hamburger" id="hamburgerBtn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <button class="sample-videos-btn" id="sampleVideosBtn">Sample Videos</button>
         <div class="video-section" id="videoSection">
             <button class="close-grid" id="closeGrid">✕</button>
             <div class="video-grid" id="videoGrid"></div>
         </div>
-        <nav class="nav-menu">
-            <ul class="nav-menu-items" id="videoList">
-                <!-- Video links will be populated here -->
-            </ul>
-        </nav>
-      
-
     </div>
     
     <script>
@@ -404,27 +362,32 @@
             {
                 value: '0',
                 label: 'GPU Dependency',
-                suffix: ''
+                suffix: '',
+                description: ''
             },
             {
                 value: '0',
                 label: 'Carbon Emissions',
-                suffix: ''
+                suffix: '',
+                description: ''
             },
             {
                 value: '0',
                 label: 'Operating Cost',
-                suffix: ''
+                suffix: '',
+                description: ''
             },
             {
                 value: '300',
                 label: 'High-Quality Animation Codes',
-                suffix: '+'
+                suffix: '+',
+                description: ''
             },
             {
                 value: '100',
                 label: 'Potential Savings for Big Tech',
-                suffix: 'B+'
+                suffix: 'B+',
+                description: ''
             }
         ];
 
@@ -441,13 +404,19 @@
                 const p = document.createElement('p');
                 p.textContent = metric.label;
                 
+                const desc = document.createElement('p');
+                desc.textContent = metric.description;
+                desc.style.fontSize = '0.8rem';
+                desc.style.color = '#888';
+                desc.style.marginTop = '5px';
+                
                 metricDiv.appendChild(h3);
                 metricDiv.appendChild(p);
+                metricDiv.appendChild(desc);
                 
                 metricsContainer.appendChild(metricDiv);
             });
         }
-
 
         const videos = [
             'angrybirds.webm', 'avengers.webm', 'balloon.webm', 'butterfly.webm',
@@ -461,9 +430,6 @@
             'waterwaves.webm', 'waterwaves1.webm', 'yellowtoy.webm', 'zomatodriver.webm'
         ];
 
-
-
-   
         function createVideoGrid() {
             const grid = document.getElementById('videoGrid');
             
@@ -493,7 +459,6 @@
                 videoItem.appendChild(videoWrapper);
                 videoItem.appendChild(title);
                 
-                // Hover events
                 videoItem.addEventListener('mouseenter', () => {
                     video.play();
                 });
@@ -507,29 +472,21 @@
             });
         }
       
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sampleVideosBtn = document.getElementById('sampleVideosBtn');
         const videoSection = document.getElementById('videoSection');
         const closeGrid = document.getElementById('closeGrid');
 
-
-
         function toggleVideoGrid() {
             videoSection.classList.toggle('active');
-            hamburgerBtn.classList.toggle('active');
         }
 
-
-        hamburgerBtn.addEventListener('click', toggleVideoGrid);
+        sampleVideosBtn.addEventListener('click', toggleVideoGrid);
         closeGrid.addEventListener('click', toggleVideoGrid);
-
-        // document.addEventListener('DOMContentLoaded', createVideoGrid);
-
 
         document.addEventListener('DOMContentLoaded', () => {
             createMetrics();
             createVideoGrid();
         });
-
 
     </script>
 </body>

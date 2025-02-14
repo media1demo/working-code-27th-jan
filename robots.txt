@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://imaginea.store/sitemap.xml

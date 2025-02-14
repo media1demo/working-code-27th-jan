@@ -334,6 +334,7 @@ function toggleAnimationEffects() {
 //         }
 //     });
 // }
+
 function toggleAllEffects() {
     const isChecked = masterCheckbox.checked;
     const searchTerm = effectSearchBar.value.toLowerCase();
@@ -354,6 +355,7 @@ function toggleAllEffects() {
     // Update displayed buttons after toggling checkboxes
     displayEffectButtons();
 }
+
 function updateMasterCheckbox() {
     const effectCheckboxes = effects.filter(effect => !animationEffects.includes(effect));
     const allChecked = effectCheckboxes.every(effect => document.getElementById(effect + 'Checkbox').checked);
@@ -366,7 +368,6 @@ function updateEffectDisplay(effect) {
     const effectButton = document.querySelector(`.effect-button[data-effect="${effect}"]`);
     if (effectButton) effectButton.classList.add('processed');
 }
-
 
 let startTime = 0;
 let endTime = 0;
@@ -471,103 +472,6 @@ function applyEffect(effect, imageData, value, selectedRegions) {
 }
 
 
-// function displayEffectButtons() {
-//     Array.from(effectControls.children).forEach(child => {
-//         if (child.tagName !== 'DIV') { // Assuming checkboxes are in div containers
-//             child.remove();
-//         }
-//     });
-
-//     effects.forEach(effect => {
-//         const button = document.createElement('button');
-//         button.className = 'effect-button';
-//         button.textContent = effect;
-//         button.dataset.effect = effect;
-//         button.dataset.active = 'true';
-//         button.addEventListener('mouseenter', () => displayEffectImages(effect));
-//         button.addEventListener('click', () => { toggleEffect(button); displayEffectImages(effect); });
-        
-//         const checkboxDiv = document.querySelector(`.effect-control input[id="${effect}Checkbox"]`).closest('.effect-control');
-//         checkboxDiv.insertAdjacentElement('afterend', button);
-//     });
-// }
-
-
-// function displayEffectButtons() {
-//     // Clear existing buttons
-//     Array.from(effectControls.children).forEach(child => {
-//         if (child.tagName !== 'DIV') { // Assuming checkboxes are in div containers
-//             child.remove();
-//         }
-//     });
-
-//     // Sort effects: checked effects first, then unchecked
-//     const sortedEffects = effects.sort((a, b) => {
-//         const aChecked = document.getElementById(`${a}Checkbox`).checked;
-//         const bChecked = document.getElementById(`${b}Checkbox`).checked;
-//         if (aChecked && !bChecked) return -1; // a comes first
-//         if (!aChecked && bChecked) return 1;  // b comes first
-//         return 0; // no change in order
-//     });
-
-//     // Create and display buttons in the sorted order
-//     sortedEffects.forEach(effect => {
-//         const button = document.createElement('button');
-//         button.className = 'effect-button';
-//         button.textContent = effect;
-//         button.dataset.effect = effect;
-//         button.dataset.active = 'true';
-//         button.addEventListener('mouseenter', () => displayEffectImages(effect));
-//         button.addEventListener('click', () => { toggleEffect(button); displayEffectImages(effect); });
-        
-//         const checkboxDiv = document.querySelector(`.effect-control input[id="${effect}Checkbox"]`).closest('.effect-control');
-//         checkboxDiv.insertAdjacentElement('afterend', button);
-//     });
-// }
-
-// function displayEffectButtons() {
-//     // Clear existing buttons
-//     Array.from(effectControls.children).forEach(child => {
-//         if (child.tagName !== 'DIV') { // Assuming checkboxes are in div containers
-//             child.remove();
-//         }
-//     });
-
-//     // Sort effects: checked effects first, then unchecked
-//     const sortedEffects = effects.sort((a, b) => {
-//         const aChecked = document.getElementById(`${a}Checkbox`).checked;
-//         const bChecked = document.getElementById(`${b}Checkbox`).checked;
-//         if (aChecked && !bChecked) return -1; // a comes first
-//         if (!aChecked && bChecked) return 1;  // b comes first
-//         return 0; // no change in order
-//     });
-
-//     // Create and display buttons in the sorted order
-//     sortedEffects.forEach(effect => {
-
-//         const isChecked = document.getElementById(`${effect}Checkbox`).checked;
-
-//         // Only create a button for checked effects
-//         if (isChecked) {
-
-//         const button = document.createElement('button');
-//         button.className = 'effect-button';
-//         button.textContent = effect;
-//         button.dataset.effect = effect;
-//         button.dataset.active = 'true';
-//         button.addEventListener('mouseenter', () => displayEffectImages(effect));
-//         button.addEventListener('click', () => { toggleEffect(button); displayEffectImages(effect); });
-        
-//         const checkboxDiv = document.querySelector(`.effect-control input[id="${effect}Checkbox"]`).closest('.effect-control');
-//         checkboxDiv.insertAdjacentElement('afterend', button);
-//     }
-
-
-//     });
-// }
-
-
-
 function displayEffectButtons() {
     const searchTerm = effectSearchBar.value.toLowerCase();
     
@@ -625,6 +529,7 @@ function initializeEffectControls() {
         effectControls.appendChild(div);
     });
 }
+
 async function fastProcessImage(img, existingGeneratedImages = []) {
     processedImages = {};  
     const imageCount = parseInt(imageCountInput.value);
@@ -779,25 +684,146 @@ async function fastProcessImage(img, existingGeneratedImages = []) {
 
 sourceImages = [];
 
+
+function displayFinishedAnimations() {
+    resultsContainer.innerHTML = ''; // Clear existing content
+
+    // Iterate through all effects
+    effects.forEach(effect => {
+        if (animationStatus[effect] && processedImages[effect]?.length > 0) {
+            // Create a container for the effect
+            const container = document.createElement('div');
+            container.className = 'effect-container';
+
+            // Add a label for the effect
+            const label = document.createElement('div');
+            label.className = 'effect-label';
+            label.textContent = effect; // Use the effect name as the label
+            container.appendChild(label);
+
+            // Create a wrapper for the animation
+            const wrapper = document.createElement('div');
+            wrapper.className = 'canvas-wrapper';
+
+            // Create the image element for the animation
+            const img = new Image();
+            img.id = `${effect}-image`;
+            img.className = 'processed-image';
+
+            // Add the image to the wrapper
+            wrapper.appendChild(img);
+
+            // Add a download icon
+            const downloadIcon = document.createElement('div');
+            downloadIcon.className = 'download-icon';
+            downloadIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            `;
+
+            // Add click handler for download icon
+            downloadIcon.addEventListener('click', async () => {
+                const originalContent = downloadIcon.innerHTML;
+                downloadIcon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                `;
+
+                try {
+                    const gif = new GIF({
+                        workers: 2,
+                        quality: 10,
+                        width: img.naturalWidth || 400,
+                        height: img.naturalHeight || 300,
+                        background: '#FFFFFF'
+                    });
+
+                    // Add frames to the GIF
+                    processedImages[effect].forEach(imageData => {
+                        const tempImg = new Image();
+                        tempImg.src = imageData.dataUrl;
+                        gif.addFrame(tempImg, { delay: 200 });
+                    });
+
+                    // Render the GIF
+                    gif.on('finished', (blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${effect}-animation.gif`;
+                        document.body.appendChild(a);
+                        a.click();
+
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+
+                        downloadIcon.innerHTML = originalContent;
+                    });
+
+                    gif.render();
+                } catch (error) {
+                    console.error('Error creating GIF:', error);
+                    downloadIcon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    `;
+                    setTimeout(() => {
+                        downloadIcon.innerHTML = originalContent;
+                    }, 2000);
+                }
+            });
+
+            // Add the download icon to the wrapper
+            wrapper.appendChild(downloadIcon);
+
+            // Add the wrapper to the container
+            container.appendChild(wrapper);
+
+            // Add the container to the results
+            resultsContainer.appendChild(container);
+
+            // Animate the images
+            let currentFrame = 0;
+            function animate() {
+                img.src = processedImages[effect][currentFrame].dataUrl;
+                currentFrame = (currentFrame + 1) % processedImages[effect].length;
+                setTimeout(animate, 200);
+            }
+            animate();
+        }
+    });
+}
+
+
 async function processImage(img) {
+    setInterval(() => {
+        displayFinishedAnimations();
+    }, 3000);
     processedImages = {};
+    animationStatus = {};
 
     const defaultImageCount = parseInt(imageCountInput.value);
     displayEffectButtons();
 
-    // Create a copy of generated images to prevent infinite processing
     const existingGeneratedImages = generatedImages ? [...generatedImages] : [];
-    // Clear generated images if processing original image
+
     if (!existingGeneratedImages.length) {
         generatedImages = [];
     }
   
     for (const effect of effects.filter(effect => document.getElementById(`${effect}Checkbox`).checked)) {
         processedImages[effect] = [];
-        // // console.log(`Processing effect: ${effect}`);
-        // // console.log(selectedRegions);
-        
-        // If we have generated images, process each one once
+        animationStatus[effect] = false; // Mark as not finished initially
+
         if (existingGeneratedImages && existingGeneratedImages.length > 0) {
             // // console.log(`Processing ${existingGeneratedImages.length} generated images`);
             
@@ -810,6 +836,7 @@ async function processImage(img) {
                     // Convert the generated image to HTMLImageElement
                     if (generatedImg instanceof HTMLImageElement) {
                         processedImage = generatedImg;
+                        
                     } else if (typeof generatedImg === 'string' && 
                              (generatedImg.startsWith('data:image') || generatedImg.startsWith('http'))) {
                         
@@ -860,7 +887,9 @@ async function processImage(img) {
                             sourceType: 'generated',
                             sourceIndex: i
                         };
-                        
+                        animationStatus[effect] = true;
+                        console.log(`Finished processing: ${effect}`);
+            
                         processedImages[effect].push(processedResult);
                         // // console.log(selectedRegions);
                         sourceImages.push({
@@ -878,6 +907,9 @@ async function processImage(img) {
                         // // console.log(selectedRegions);
                         updateEffectDisplay(effect);
                         // // console.log(selectedRegions);
+                        // if (Date.now() - processStartTime >= 3000) {
+                        //     displayFinishedAnimations();
+                        // }
                     }
 
                     
@@ -918,6 +950,9 @@ async function processImage(img) {
                         sourceIndex: 0
                     };
                     // // console.log(selectedRegions);
+                    animationStatus[effect] = true;
+                    console.log(`Finished processing: ${effect}`);
+        
                     processedImages[effect].push(processedResult);
                     
                     // Add to generated images for future processing
@@ -933,6 +968,9 @@ async function processImage(img) {
                         sourceIndex: 0,
                         value: value
                     });
+                    // animationStatus[effect] = true;
+                    // console.log(`Finished processing: ${effect}`);
+        
                     // // console.log(selectedRegions);
                     sourceImages.push({
                         index: value,
@@ -948,6 +986,10 @@ async function processImage(img) {
                     });
                     // // console.log(selectedRegions);
                     updateEffectDisplay(effect);
+
+                    // if (Date.now() - processStartTime >= 3000) {
+                    //     displayFinishedAnimations();
+                    // }
                 } catch (error) {
                     console.error(`Error processing original image variation ${i + 1}:`, error);
                 }
@@ -961,43 +1003,6 @@ async function processImage(img) {
 
 function displayProcessedImages() {
     // resultsContainer.innerHTML = '';
-    
-    // for (const effect in processedImages) {
-    //     if (document.getElementById(`${effect}Checkbox`).checked) {
-    //         const images = processedImages[effect];
-    //         // Check if images exist and have data
-    //         if (images && images.length > 0 && images[0] && images[0].imageData) {
-    //             const effectDiv = document.createElement('div');
-    //             effectDiv.className = 'effect-results';
-                
-    //             const effectTitle = document.createElement('h3');
-    //             effectTitle.textContent = effect;
-    //             effectDiv.appendChild(effectTitle);
-                
-    //             const canvas = document.createElement('canvas');
-    //             canvas.width = images[0].imageData.width;
-    //             canvas.height = images[0].imageData.height;
-    //             effectDiv.appendChild(canvas);
-                
-    //             const ctx = canvas.getContext('2d');
-    //             let currentFrame = 0;
-                
-    //             function animate() {
-    //                 if (images[currentFrame] && images[currentFrame].imageData) {
-    //                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //                     ctx.putImageData(images[currentFrame].imageData, 0, 0);
-    //                     currentFrame = (currentFrame + 1) % images.length;
-    //                     setTimeout(animate, 200);
-    //                 }
-    //             }
-                
-    //             animate();
-    //             resultsContainer.appendChild(effectDiv);
-    //         } else {
-    //             // console.log(`No valid image data found for effect: ${effect}`);
-    //         }
-    //     }
-    // }
 
 }
 
@@ -1047,6 +1052,32 @@ function convertImageRepresentation(imageRepresentation) {
     });
 }
 
+function stopAnimation(effectId) {
+    if (activeAnimations.has(effectId)) {
+        clearTimeout(activeAnimations.get(effectId));
+        activeAnimations.delete(effectId);
+    }
+}
+
+function startAnimation(img, images, effectId) {
+    let currentFrame = 0;
+    
+    function animate() {
+        if (!document.getElementById(`${effectId}-image`)) {
+            stopAnimation(effectId);
+            return;
+        }
+        
+        img.src = images[currentFrame].dataUrl;
+        currentFrame = (currentFrame + 1) % images.length;
+        
+        const timeoutId = setTimeout(animate, 200);
+        activeAnimations.set(effectId, timeoutId);
+    }
+    
+    animate();
+}
+
 function processImageWithMethod(processingMethod) {
 
     if (!useCredits(1)) {
@@ -1080,37 +1111,153 @@ function toggleEffect(button) {
 }
 
 function displayEffectImages(effect) {
-    resultsContainer.innerHTML = '';
+    resetHoverTimeout(); // Reset the timeout on hover
 
+    resultsContainer.innerHTML = '';
+    
     if (document.getElementById(`${effect}Checkbox`).checked) {
         const images = processedImages[effect];
-        // console.log(processedImages);
+        
         if (images && images.length > 0) {
-            // Create single wrapper for animation
+            const container = document.createElement('div');
+            container.className = 'effect-container';
+            
             const wrapper = document.createElement('div');
             wrapper.className = 'canvas-wrapper';
             
-            // Create single image element that will be updated
+            // Updated download icon with white fill
+            const downloadIcon = document.createElement('div');
+            downloadIcon.className = 'download-icon';
+            downloadIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            `;
+            
             const img = new Image();
             img.id = `${effect}-image`;
             img.className = 'processed-image';
-            wrapper.appendChild(img);
-            resultsContainer.appendChild(wrapper);
             
-            // Animation variables
+            wrapper.appendChild(img);
+            wrapper.appendChild(downloadIcon);
+            
+            downloadIcon.addEventListener('click', async () => {
+                // Updated loading spinner with white fill
+                const originalContent = downloadIcon.innerHTML;
+                downloadIcon.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                `;
+            
+                try {
+                    const logo = await new Promise((resolve, reject) => {
+                        const logoImg = new Image();
+                        logoImg.crossOrigin = "anonymous";
+                        logoImg.onload = () => resolve(logoImg);
+                        logoImg.onerror = reject;
+                        logoImg.src = 'logo1.jpg';
+                    });
+            
+                    const gif = new GIF({
+                        workers: 2,
+                        quality: 10,
+                        width: img.naturalWidth || 400,
+                        height: img.naturalHeight || 300,
+                        background: '#FFFFFF'  // Set white background
+                    });
+            
+                    const loadedImages = await Promise.all(images.map(imageData => {
+                        return new Promise((resolve) => {
+                            const tempImg = new Image();
+                            tempImg.onload = () => resolve(tempImg);
+                            tempImg.src = imageData.dataUrl;
+                        });
+                    }));
+            
+                    loadedImages.forEach(loadedImg => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+            
+                        canvas.width = loadedImg.width;
+                        canvas.height = loadedImg.height;
+                        
+                        // Fill canvas with white background first
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+                        // Draw original image
+                        ctx.drawImage(loadedImg, 0, 0);
+            
+                        const logoSize = {
+                            width: loadedImg.width * 0.1,
+                            height: loadedImg.height * 0.05
+                        };
+            
+                        const logoPosition = {
+                            x: canvas.width - logoSize.width - 10,
+                            y: canvas.height - logoSize.height - 10
+                        };
+            
+                        ctx.drawImage(
+                            logo,
+                            logoPosition.x,
+                            logoPosition.y,
+                            logoSize.width,
+                            logoSize.height
+                        );
+            
+                        gif.addFrame(canvas, { delay: 200 });
+                    });
+            
+                    gif.on('finished', (blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${effect}-animation.gif`;
+                        document.body.appendChild(a);
+                        a.click();
+            
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+            
+                        downloadIcon.innerHTML = originalContent;
+                    });
+            
+                    gif.render();
+            
+                } catch (error) {
+                    console.error('Error creating GIF:', error);
+                    // Updated error icon with white fill
+                    downloadIcon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                    `;
+                    setTimeout(() => {
+                        downloadIcon.innerHTML = originalContent;
+                    }, 2000);
+                }
+            });
+
+            container.appendChild(wrapper);
+            resultsContainer.appendChild(container);
+            
             let currentFrame = 0;
             
             function animate() {
-                // Update image source to current frame
                 img.src = images[currentFrame].dataUrl;
-                // Move to next frame
                 currentFrame = (currentFrame + 1) % images.length;
-                // Continue animation after 200ms
                 setTimeout(animate, 200);
             }
             
             animate();
-
         } else {
             resultsContainer.textContent = 'Processing...';
         }
@@ -1118,6 +1265,121 @@ function displayEffectImages(effect) {
         resultsContainer.textContent = 'Effect not selected';
     }
 }
+
+
+
+
+// Updated styles for the download icon
+const styles = `
+.canvas-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.download-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.download-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.download-icon:active {
+    transform: translateY(0);
+}
+
+.download-icon svg {
+    display: block;
+    color: #4CAF50;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.effect-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+`;
+
+// Add styles to document
+if (!document.getElementById('effect-styles')) {
+    const styleElement = document.createElement('style');
+    styleElement.id = 'effect-styles';
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+}
+
+
+let hoverTimeout;
+
+let activeAnimations = new Map(); // Track active animations
+
+
+function resetHoverTimeout() {
+    clearTimeout(hoverTimeout);
+    hoverTimeout = setTimeout(displayAllAnimations, 3000); // 3 seconds
+}
+
+function displayAllAnimations() {
+    resultsContainer.innerHTML = '';
+    
+    effects.forEach(effect => {
+        if (document.getElementById(`${effect}Checkbox`).checked) {
+            const images = processedImages[effect];
+            
+            if (images && images.length > 0) {
+                const container = document.createElement('div');
+                container.className = 'effect-container';
+                
+                 // Add a label for the effect
+                 const label = document.createElement('div');
+                 label.className = 'effect-label';
+                 label.textContent = effect; // Use the effect name as the label
+                 container.appendChild(label);
+                 
+                const wrapper = document.createElement('div');
+                wrapper.className = 'canvas-wrapper';
+                
+                const img = new Image();
+                img.id = `${effect}-image`;
+                img.className = 'processed-image';
+                
+                wrapper.appendChild(img);
+                container.appendChild(wrapper);
+                resultsContainer.appendChild(container);
+                
+                let currentFrame = 0;
+                
+                function animate() {
+                    img.src = images[currentFrame].dataUrl;
+                    currentFrame = (currentFrame + 1) % images.length;
+                    setTimeout(animate, 200);
+                }
+                
+                animate();
+            }
+        }
+    });
+}
+
 
 function getEffectValue(effect, index, count) {
     const t = index / (count - 1);

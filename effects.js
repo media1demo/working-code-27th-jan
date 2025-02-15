@@ -936,68 +936,69 @@ shareIcon.addEventListener('click', async (event) => {
 });
 
 
-function loadWatermarkLogo(logoUrl) {
-  return new Promise((resolve, reject) => {
-    const logoImg = new Image();
-    logoImg.crossOrigin = "anonymous";
-    logoImg.onload = () => resolve(logoImg);
-    logoImg.onerror = reject;
-    logoImg.src = logoUrl;
-  });
-}
 
-function loadImage(dataUrl) {
-  return new Promise((resolve) => {
-    const tempImg = new Image();
-    tempImg.onload = () => resolve(tempImg);
-    tempImg.src = dataUrl;
-  });
-}
+async function loadWatermarkLogo(logoPath) {
+    return new Promise((resolve, reject) => {
+      const logo = new Image();
+      logo.crossOrigin = "anonymous";
+      logo.onload = () => resolve(logo);
+      logo.onerror = (error) => reject(new Error(`Failed to load logo: ${error.message}`));
+      logo.src = logoPath;
+    });
+  }
 
-function createWatermarkedFrame(image, logo) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  async function loadImage(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = (error) => reject(new Error(`Failed to load image: ${error.message}`));
+      img.src = dataUrl;
+    });
+  }
   
-  canvas.width = image.width;
-  canvas.height = image.height;
+
+  function createWatermarkedFrame(image, logo) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
   
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(image, 0, 0);
+    canvas.width = image.width;
+    canvas.height = image.height;
   
-  const logoSize = {
-    width: image.width * 0.1,
-    height: image.height * 0.05
-  };
+    // Fill canvas with white background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   
-  ctx.drawImage(logo, 
-    canvas.width - logoSize.width - 10,
-    canvas.height - logoSize.height - 10,
-    logoSize.width, 
-    logoSize.height
-  );
+    // Draw the original image
+    ctx.drawImage(image, 0, 0);
   
-  return canvas;
-}
-              
+    // Calculate logo size and position
+    const logoSize = {
+      width: image.width * 0.1,
+      height: image.height * 0.05
+    };
+  
+    const logoPosition = {
+      x: canvas.width - logoSize.width - 10,
+      y: canvas.height - logoSize.height - 10
+    };
+  
+    // Draw the logo
+    ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+  
+    return canvas;
+  }
+
+  
               // Helper Functions
-              function loadWatermarkLogo(logoUrl) {
-                return new Promise((resolve, reject) => {
-                  const logoImg = new Image();
-                  logoImg.crossOrigin = "anonymous";
-                  logoImg.onload = () => resolve(logoImg);
-                  logoImg.onerror = reject;
-                  logoImg.src = logoUrl;
-                });
-              }
+         
               
-              function loadImage(dataUrl) {
-                return new Promise((resolve) => {
-                  const tempImg = new Image();
-                  tempImg.onload = () => resolve(tempImg);
-                  tempImg.src = dataUrl;
-                });
-              }
+            //   function loadImage(dataUrl) {
+            //     return new Promise((resolve) => {
+            //       const tempImg = new Image();
+            //       tempImg.onload = () => resolve(tempImg);
+            //       tempImg.src = dataUrl;
+            //     });
+            //   }
               
               function createWatermarkedFrame(image, logo) {
                 const canvas = document.createElement('canvas');
@@ -1654,16 +1655,7 @@ function createWatermarkedFrame(image, logo) {
 }
               
               // Helper Functions
-              function loadWatermarkLogo(logoUrl) {
-                return new Promise((resolve, reject) => {
-                  const logoImg = new Image();
-                  logoImg.crossOrigin = "anonymous";
-                  logoImg.onload = () => resolve(logoImg);
-                  logoImg.onerror = reject;
-                  logoImg.src = logoUrl;
-                });
-              }
-              
+     
               function loadImage(dataUrl) {
                 return new Promise((resolve) => {
                   const tempImg = new Image();

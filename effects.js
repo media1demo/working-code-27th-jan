@@ -851,18 +851,24 @@ function displayFinishedAnimations() {
             // Add a loading state variable
 let isGenerating = false;
 
-shareIcon.addEventListener('click', async (event) => {
-  // Prevent multiple clicks while generating
-  if (isGenerating) return;
-  
-  try {
-    isGenerating = true;
-    // Show loading state
-    shareIcon.disabled = true;
-    shareIcon.textContent = 'Generating...'; // or update your UI accordingly
+let isSharing = false; // Track if a share operation is in progress
 
+shareIcon.addEventListener('click', async (event) => {
+  // Prevent multiple clicks while sharing
+  if (isSharing) {
+    console.log('A share operation is already in progress.');
+    return;
+  }
+
+  try {
+    isSharing = true; // Set sharing state to true
+    shareIcon.disabled = true; // Disable the share button
+    shareIcon.textContent = 'Generating...'; // Update UI to indicate loading
+
+    // Load the watermark logo
     const logo = await loadWatermarkLogo('logo1.jpg');
-    
+
+    // Initialize GIF
     const gif = new GIF({
       workers: 2,
       quality: 10,
@@ -871,17 +877,18 @@ shareIcon.addEventListener('click', async (event) => {
       background: '#FFFFFF'
     });
 
+    // Load all processed images
     const loadedImages = await Promise.all(
       processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
     );
 
-    // Process frames
+    // Process frames and add watermark
     loadedImages.forEach(loadedImg => {
       const canvas = createWatermarkedFrame(loadedImg, logo);
       gif.addFrame(canvas, { delay: 200 });
     });
 
-    // Create and share the GIF within the same user gesture context
+    // Render the GIF
     const gifPromise = new Promise((resolve, reject) => {
       gif.on('finished', resolve);
       gif.on('error', reject);
@@ -889,36 +896,45 @@ shareIcon.addEventListener('click', async (event) => {
 
     gif.render();
 
+    // Wait for the GIF to finish rendering
     const blob = await gifPromise;
     const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
 
+    // Prepare share data
     const shareData = {
       title: 'Check out this animation!',
       text: `Created using Imaginea. Visit ${window.location.href} for more.`,
       files: [file]
     };
 
+    // Check if sharing is supported and allowed
     if (navigator.share && navigator.canShare(shareData)) {
       await navigator.share(shareData);
     } else {
+      // Fallback: Copy link to clipboard
       await navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     }
 
   } catch (error) {
     console.error('Error sharing GIF:', error);
+
+    // Handle specific errors
     if (error.name === 'NotAllowedError') {
       alert('Sharing canceled.');
+    } else if (error.name === 'AbortError') {
+      alert('Sharing was aborted.');
     } else {
       alert('Error sharing. Please try again.');
     }
   } finally {
     // Reset UI state
-    isGenerating = false;
+    isSharing = false;
     shareIcon.disabled = false;
-    shareIcon.textContent = 'Share'; // or reset to original state
+    shareIcon.textContent = 'Share'; // Reset to original state
   }
 });
+
 
 function loadWatermarkLogo(logoUrl) {
   return new Promise((resolve, reject) => {

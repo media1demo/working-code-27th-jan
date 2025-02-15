@@ -684,7 +684,6 @@ async function fastProcessImage(img, existingGeneratedImages = []) {
 
 sourceImages = [];
 
-
 function displayFinishedAnimations() {
     resultsContainer.innerHTML = ''; // Clear existing content
 
@@ -724,6 +723,20 @@ function displayFinishedAnimations() {
                 </svg>
             `;
 
+
+            const shareIcon = document.createElement('div');
+            shareIcon.className = 'share-icon';
+            shareIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+            `;
+
+
             // Add click handler for download icon
             downloadIcon.addEventListener('click', async () => {
                 const originalContent = downloadIcon.innerHTML;
@@ -734,6 +747,15 @@ function displayFinishedAnimations() {
                 `;
 
                 try {
+                    // Load the logo
+                    const logo = await new Promise((resolve, reject) => {
+                        const logoImg = new Image();
+                        logoImg.crossOrigin = "anonymous";
+                        logoImg.onload = () => resolve(logoImg);
+                        logoImg.onerror = reject;
+                        logoImg.src = 'logo1.jpg';
+                    });
+
                     const gif = new GIF({
                         workers: 2,
                         quality: 10,
@@ -742,11 +764,52 @@ function displayFinishedAnimations() {
                         background: '#FFFFFF'
                     });
 
-                    // Add frames to the GIF
-                    processedImages[effect].forEach(imageData => {
-                        const tempImg = new Image();
-                        tempImg.src = imageData.dataUrl;
-                        gif.addFrame(tempImg, { delay: 200 });
+                    // Load all images first
+                    const loadedImages = await Promise.all(processedImages[effect].map(imageData => {
+                        return new Promise((resolve) => {
+                            const tempImg = new Image();
+                            tempImg.onload = () => resolve(tempImg);
+                            tempImg.src = imageData.dataUrl;
+                        });
+                    }));
+
+                    // Add frames to the GIF with logo
+                    loadedImages.forEach(loadedImg => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        canvas.width = loadedImg.width;
+                        canvas.height = loadedImg.height;
+                        
+                        // Fill canvas with white background first
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // Draw original image
+                        ctx.drawImage(loadedImg, 0, 0);
+
+                        // Calculate logo size and position
+                        const logoSize = {
+                            width: loadedImg.width * 0.1,
+                            height: loadedImg.height * 0.05
+                        };
+
+                        const logoPosition = {
+                            x: canvas.width - logoSize.width - 10,
+                            y: canvas.height - logoSize.height - 10
+                        };
+
+                        // Draw the logo
+                        ctx.drawImage(
+                            logo,
+                            logoPosition.x,
+                            logoPosition.y,
+                            logoSize.width,
+                            logoSize.height
+                        );
+
+                        // Add the frame to the GIF
+                        gif.addFrame(canvas, { delay: 200 });
                     });
 
                     // Render the GIF
@@ -782,8 +845,203 @@ function displayFinishedAnimations() {
                 }
             });
 
-            // Add the download icon to the wrapper
+
+           
+         
+            // Add a loading state variable
+let isGenerating = false;
+
+shareIcon.addEventListener('click', async (event) => {
+  // Prevent multiple clicks while generating
+  if (isGenerating) return;
+  
+  try {
+    isGenerating = true;
+    // Show loading state
+    shareIcon.disabled = true;
+    shareIcon.textContent = 'Generating...'; // or update your UI accordingly
+
+    const logo = await loadWatermarkLogo('logo1.jpg');
+    
+    const gif = new GIF({
+      workers: 2,
+      quality: 10,
+      width: img.naturalWidth || 400,
+      height: img.naturalHeight || 300,
+      background: '#FFFFFF'
+    });
+
+    const loadedImages = await Promise.all(
+      processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
+    );
+
+    // Process frames
+    loadedImages.forEach(loadedImg => {
+      const canvas = createWatermarkedFrame(loadedImg, logo);
+      gif.addFrame(canvas, { delay: 200 });
+    });
+
+    // Create and share the GIF within the same user gesture context
+    const gifPromise = new Promise((resolve, reject) => {
+      gif.on('finished', resolve);
+      gif.on('error', reject);
+    });
+
+    gif.render();
+
+    const blob = await gifPromise;
+    const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+
+    const shareData = {
+      title: 'Check out this animation!',
+      text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+      files: [file]
+    };
+
+    if (navigator.share && navigator.canShare(shareData)) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+
+  } catch (error) {
+    console.error('Error sharing GIF:', error);
+    if (error.name === 'NotAllowedError') {
+      alert('Sharing canceled.');
+    } else {
+      alert('Error sharing. Please try again.');
+    }
+  } finally {
+    // Reset UI state
+    isGenerating = false;
+    shareIcon.disabled = false;
+    shareIcon.textContent = 'Share'; // or reset to original state
+  }
+});
+
+function loadWatermarkLogo(logoUrl) {
+  return new Promise((resolve, reject) => {
+    const logoImg = new Image();
+    logoImg.crossOrigin = "anonymous";
+    logoImg.onload = () => resolve(logoImg);
+    logoImg.onerror = reject;
+    logoImg.src = logoUrl;
+  });
+}
+
+function loadImage(dataUrl) {
+  return new Promise((resolve) => {
+    const tempImg = new Image();
+    tempImg.onload = () => resolve(tempImg);
+    tempImg.src = dataUrl;
+  });
+}
+
+function createWatermarkedFrame(image, logo) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = image.width;
+  canvas.height = image.height;
+  
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(image, 0, 0);
+  
+  const logoSize = {
+    width: image.width * 0.1,
+    height: image.height * 0.05
+  };
+  
+  ctx.drawImage(logo, 
+    canvas.width - logoSize.width - 10,
+    canvas.height - logoSize.height - 10,
+    logoSize.width, 
+    logoSize.height
+  );
+  
+  return canvas;
+}
+              
+              // Helper Functions
+              function loadWatermarkLogo(logoUrl) {
+                return new Promise((resolve, reject) => {
+                  const logoImg = new Image();
+                  logoImg.crossOrigin = "anonymous";
+                  logoImg.onload = () => resolve(logoImg);
+                  logoImg.onerror = reject;
+                  logoImg.src = logoUrl;
+                });
+              }
+              
+              function loadImage(dataUrl) {
+                return new Promise((resolve) => {
+                  const tempImg = new Image();
+                  tempImg.onload = () => resolve(tempImg);
+                  tempImg.src = dataUrl;
+                });
+              }
+              
+              function createWatermarkedFrame(image, logo) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas dimensions
+                canvas.width = image.width;
+                canvas.height = image.height;
+                
+                // Draw white background
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the main image
+                ctx.drawImage(image, 0, 0);
+                
+                // Calculate logo dimensions and position
+                const logoSize = {
+                  width: image.width * 0.1,
+                  height: image.height * 0.05
+                };
+                const logoPosition = {
+                  x: canvas.width - logoSize.width - 10,
+                  y: canvas.height - logoSize.height - 10
+                };
+                
+                // Draw the logo
+                ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+                
+                return canvas;
+              }
+              
+              async function createGifFile(blob, effect) {
+                return new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+              }
+              
+              async function shareGifContent(file) {
+                const shareData = {
+                  title: 'Check out this animation!',
+                  text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+                  files: [file]
+                };
+              
+                if (navigator.share && navigator.canShare(shareData)) {
+                  await navigator.share(shareData);
+                } else {
+                  // Fallback to clipboard
+                  await navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }
+              
+              function handleError(error) {
+                console.error('Error sharing GIF:', error);
+                alert('Sharing failed. Please try again.');
+              }
+
+
             wrapper.appendChild(downloadIcon);
+            wrapper.appendChild(shareIcon);    
 
             // Add the wrapper to the container
             container.appendChild(wrapper);
@@ -802,7 +1060,6 @@ function displayFinishedAnimations() {
         }
     });
 }
-
 
 async function processImage(img) {
     setInterval(() => {
@@ -1000,14 +1257,10 @@ async function processImage(img) {
     displayProcessedImages();
 }
 
-
 function displayProcessedImages() {
     // resultsContainer.innerHTML = '';
-
 }
 
-
-// Add the filter effects function
 function filterEffects(event) {
     const searchTerm = event.target.value.toLowerCase();
     const effectControls = document.getElementById('effectControls');
@@ -1136,6 +1389,21 @@ function displayEffectImages(effect) {
                 </svg>
             `;
             
+
+            const shareIcon = document.createElement('div');
+            shareIcon.className = 'share-icon';
+            shareIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+            `;
+
+            wrapper.appendChild(shareIcon); // Add share icon to the wrapper
+
             const img = new Image();
             img.id = `${effect}-image`;
             img.className = 'processed-image';
@@ -1245,6 +1513,204 @@ function displayEffectImages(effect) {
                     }, 2000);
                 }
             });
+
+            imageCanvas.addEventListener('mousemove', (event) => {
+                const rect = imageCanvas.getBoundingClientRect();
+                crosshairX = event.clientX - rect.left;
+                crosshairY = event.clientY - rect.top;
+                redrawCanvas();
+            });
+
+
+            let isGenerating = false;
+
+shareIcon.addEventListener('click', async (event) => {
+  // Prevent multiple clicks while generating
+  if (isGenerating) return;
+  
+  try {
+    isGenerating = true;
+    // Show loading state
+    shareIcon.disabled = true;
+    shareIcon.textContent = 'Generating...'; // or update your UI accordingly
+
+    const logo = await loadWatermarkLogo('logo1.jpg');
+    
+    const gif = new GIF({
+      workers: 2,
+      quality: 10,
+      width: img.naturalWidth || 400,
+      height: img.naturalHeight || 300,
+      background: '#FFFFFF'
+    });
+
+    const loadedImages = await Promise.all(
+      processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
+    );
+
+    // Process frames
+    loadedImages.forEach(loadedImg => {
+      const canvas = createWatermarkedFrame(loadedImg, logo);
+      gif.addFrame(canvas, { delay: 200 });
+    });
+
+    // Create and share the GIF within the same user gesture context
+    const gifPromise = new Promise((resolve, reject) => {
+      gif.on('finished', resolve);
+      gif.on('error', reject);
+    });
+
+    gif.render();
+
+    const blob = await gifPromise;
+    const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+
+    const shareData = {
+      title: 'Check out this animation!',
+      text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+      files: [file]
+    };
+
+    if (navigator.share && navigator.canShare(shareData)) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+
+  } catch (error) {
+    console.error('Error sharing GIF:', error);
+    if (error.name === 'NotAllowedError') {
+      alert('Sharing canceled.');
+    } else {
+      alert('Error sharing. Please try again.');
+    }
+  } finally {
+    // Reset UI state
+    isGenerating = false;
+    shareIcon.disabled = false;
+    shareIcon.textContent = 'Share'; // or reset to original state
+  }
+});
+
+function loadWatermarkLogo(logoUrl) {
+  return new Promise((resolve, reject) => {
+    const logoImg = new Image();
+    logoImg.crossOrigin = "anonymous";
+    logoImg.onload = () => resolve(logoImg);
+    logoImg.onerror = reject;
+    logoImg.src = logoUrl;
+  });
+}
+
+function loadImage(dataUrl) {
+  return new Promise((resolve) => {
+    const tempImg = new Image();
+    tempImg.onload = () => resolve(tempImg);
+    tempImg.src = dataUrl;
+  });
+}
+
+function createWatermarkedFrame(image, logo) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = image.width;
+  canvas.height = image.height;
+  
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(image, 0, 0);
+  
+  const logoSize = {
+    width: image.width * 0.1,
+    height: image.height * 0.05
+  };
+  
+  ctx.drawImage(logo, 
+    canvas.width - logoSize.width - 10,
+    canvas.height - logoSize.height - 10,
+    logoSize.width, 
+    logoSize.height
+  );
+  
+  return canvas;
+}
+              
+              // Helper Functions
+              function loadWatermarkLogo(logoUrl) {
+                return new Promise((resolve, reject) => {
+                  const logoImg = new Image();
+                  logoImg.crossOrigin = "anonymous";
+                  logoImg.onload = () => resolve(logoImg);
+                  logoImg.onerror = reject;
+                  logoImg.src = logoUrl;
+                });
+              }
+              
+              function loadImage(dataUrl) {
+                return new Promise((resolve) => {
+                  const tempImg = new Image();
+                  tempImg.onload = () => resolve(tempImg);
+                  tempImg.src = dataUrl;
+                });
+              }
+              
+              function createWatermarkedFrame(image, logo) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas dimensions
+                canvas.width = image.width;
+                canvas.height = image.height;
+                
+                // Draw white background
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the main image
+                ctx.drawImage(image, 0, 0);
+                
+                // Calculate logo dimensions and position
+                const logoSize = {
+                  width: image.width * 0.1,
+                  height: image.height * 0.05
+                };
+                const logoPosition = {
+                  x: canvas.width - logoSize.width - 10,
+                  y: canvas.height - logoSize.height - 10
+                };
+                
+                // Draw the logo
+                ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+                
+                return canvas;
+              }
+              
+              async function createGifFile(blob, effect) {
+                return new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+              }
+              
+              async function shareGifContent(file) {
+                const shareData = {
+                  title: 'Check out this animation!',
+                  text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+                  files: [file]
+                };
+              
+                if (navigator.share && navigator.canShare(shareData)) {
+                  await navigator.share(shareData);
+                } else {
+                  // Fallback to clipboard
+                  await navigator.clipboard.writeText(window.location.href);
+                  alert('Link copied to clipboard!');
+                }
+              }
+              
+              function handleError(error) {
+                console.error('Error sharing GIF:', error);
+                alert('Sharing failed. Please try again.');
+              }
 
             container.appendChild(wrapper);
             resultsContainer.appendChild(container);

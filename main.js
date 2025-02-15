@@ -146,25 +146,6 @@ function performMagicWandSelection(x, y) {
     
 }
 
-function redrawCanvas() {
-    if (!originalImage) return;
-    
-    ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-    ctx.drawImage(originalImage, 0, 0);
-    
-    // Draw existing selections
-    displaySelectedRegionsBorders();
-    
-    // Draw tool-specific previews
-    if (activeTool === 'lasso' && lassoPoints.length > 0) {
-        drawLassoPreview();
-    } else if (activeTool === 'polygonLasso' && polygonPoints.length > 0) {
-        drawPolygonPreview();
-    }
-    else if (activeTool === TOOLS.CIRCLE_MAGIC_WAND) {
-        drawCirclePreview();
-    }
-}
 
 
 function drawCirclePreview() {
@@ -307,20 +288,59 @@ function updateObjectMask(newRegion) {
     });
 }
 
+
 function displaySelectedRegionsBorders() {
     ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
     ctx.drawImage(originalImage, 0, 0);
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'red'; // Border color
+    ctx.lineWidth = 2; // Border thickness
+
     selectedRegions.forEach(region => {
+        // Find the boundary pixels of the region
+        const boundaryPixels = findBoundaryPixels(region);
+
+        // Draw the freehand border
         ctx.beginPath();
-        region.forEach(pixelIndex => {
-            const x = pixelIndex % imageCanvas.width;
-            const y = Math.floor(pixelIndex / imageCanvas.width);
-            ctx.rect(x, y, 1, 1);
+        boundaryPixels.forEach((pixel, index) => {
+            const x = pixel % imageCanvas.width;
+            const y = Math.floor(pixel / imageCanvas.width);
+            if (index === 0) {
+                ctx.moveTo(x, y); // Move to the first pixel
+            } else {
+                ctx.lineTo(x, y); // Draw a line to the next pixel
+            }
         });
-        ctx.stroke();
+        ctx.closePath(); // Close the path to complete the border
+        ctx.stroke(); // Render the border
     });
+}
+
+// Helper function to find boundary pixels of the selected region
+function findBoundaryPixels(region) {
+    const boundaryPixels = [];
+    const visited = new Set();
+
+    region.forEach(pixelIndex => {
+        const x = pixelIndex % imageCanvas.width;
+        const y = Math.floor(pixelIndex / imageCanvas.width);
+
+        // Check all 8 neighboring pixels
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx === 0 && dy === 0) continue; // Skip the current pixel
+                const neighborIndex = (y + dy) * imageCanvas.width + (x + dx);
+
+                // If the neighbor is not part of the region, this pixel is a boundary pixel
+                if (!region.includes(neighborIndex)) {
+                    boundaryPixels.push(pixelIndex);
+                    visited.add(pixelIndex);
+                    break;
+                }
+            }
+        }
+    });
+
+    return boundaryPixels;
 }
 
 function startResizing() {
@@ -1259,10 +1279,7 @@ polygonLassoButton.addEventListener('click', toggleLassoTool); // Toggle lasso t
     //     ctx.drawImage(originalImage, 0, 0);
         
     //     // Draw existing selections
-    //     if (typeof displaySelectedRegionsBorders === 'function') {
-    //         displaySelectedRegionsBorders();
-    //     }
-        
+
     //     // Draw current lasso selection
     //     if (lassoPoints.length > 0) {
     //         ctx.beginPath();

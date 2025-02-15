@@ -3,37 +3,6 @@
     padding: 0;
     box-sizing: border-box;
 }
-
-
-.top-centered-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    z-index: 1000;
-    pointer-events: none; /* Allows clicking through the container */
-}
-
-.centered-button {
-    background-color: rgba(33, 150, 243, 0.2); /* Blue with 20% opacity */
-    color: white;
-    border: none;
-    padding: 8px 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-    pointer-events: auto; /* Re-enables clicking on the button */
-}
-
-.centered-button:hover {
-    background-color: rgba(33, 150, 243, 0.3); /* Slightly more opaque on hover */
-}
-
 #creditSystem {
     position: fixed;
     bottom: 20px;
@@ -332,6 +301,49 @@ body {
     margin-bottom: 20px;
 }
 
+input[type="file"],
+input[type="number"],
+button {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #13131f, #232338);
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#imageKeyword {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #13131f, #232338);
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#imageKeyword::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+#imageKeyword:focus {
+    outline: none;
+    background: linear-gradient(135deg, #232338, #33334f);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+}
+
+#imageKeyword:hover {
+    background: linear-gradient(135deg, #232338, #33334f);
+}
+
+
 #sidebar input[type="file"],
 #sidebar input[type="number"],
 #sidebar input[type="range"],
@@ -411,13 +423,28 @@ body {
 } */
 
 
-#mainContent {flex-grow: 1; padding: 20px; overflow-y: auto;}
+#mainContent {flex-grow: 1;
+    overflow-y: auto;}
+
+    .effect-label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    
 #mainContent {
     
-    margin-left: 320px;
-    padding: 30px;
+    /* margin-left: 320px; */
+    /* padding: 30px; */
     /* background: rgba(255, 255, 255, 0.9); */
-    background: rgba(30, 30, 47, 0.95) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
     color: #ddd !important;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5) !important;
     border-radius: 15px;
@@ -441,7 +468,7 @@ body {
     flex: 1 1 auto; /* Allow items to shrink or grow as needed */
     text-align: center;
     /* background: #fff; */
-    background: #2a2a4f !important;
+    /* background: #2a2a4f !important; */
     /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important; */
 
     padding: 20px;
@@ -523,7 +550,7 @@ body {
     }
 
     #mainContent {
-        margin-left: 0;
+        /* margin-left: 0; */
     }
 }
 
@@ -534,12 +561,12 @@ body {
     }
 
     #mainContent {
-        margin-left: 270px;
+        /* margin-left: 270px; */
     }
 }
 
 #mainContent {
-    margin-left: 320px;
+    margin-left: 300px;
     padding: 30px;
 
     border-radius: 15px;
@@ -726,7 +753,7 @@ body {
 .image-wrapper {
 
     
-    background: #fff;
+    /* background: #fff; */
     padding: 20px;
     border-radius: 10px;
     /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
@@ -944,7 +971,7 @@ width: 350px !important;
     max-width: 300px;
     margin: 10px;
     text-align: center;
-    background: #fff;
+    background: #000000;
     padding: 15px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -960,31 +987,14 @@ width: 350px !important;
     object-fit: contain;
 }
 
-/* Canvas Wrapper - Modern Styling */
-/* .canvas-wrapper {
-    display: inline-block;
-    width: 300px;
-    height: 300px;
-    margin: 10px;
-    text-align: center;
-    background: #fff;
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-} */
+
 
 .canvas-wrapper:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
-/* 
-.canvas-wrapper img {
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    object-fit: cover;
-} */
+
+
 
     .canvas-wrapper {display: inline-block; 
         width: 300px;
@@ -992,17 +1002,54 @@ width: 350px !important;
         margin: 5px; 
         text-align: center;}
 
+
+        .top-centered-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            z-index: 1000;
+            pointer-events: none; /* Allows clicking through the container */
+        }
+        
+        .canvas-wrapper button {
+            margin: 10px;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .canvas-wrapper button:hover {
+            background: #45a049;
+        }
+        .centered-button {
+            background-color: rgba(33, 150, 243, 0.02); /* Blue with 20% opacity */
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            pointer-events: auto; /* Re-enables clicking on the button */
+        }
+        
+        .centered-button:hover {
+            background-color: rgba(33, 150, 243, 0.3); /* Slightly more opaque on hover */
+        }
 #masterCheckboxControl {
     /* margin-bottom: 15px; */
 }
-/* .canvas-wrapper img{
-    width: 100px;
-    height: 100px;
-} */
-/* .canvas-wrapper img{
-    width: 300px;
-    height: 300px;
-} */
+
+
+
 
 #effectControls button:hover {
     /* background-color: #45a049; */
@@ -1031,6 +1078,17 @@ width: 350px !important;
 canvas,
 #progress {
     animation: fadeIn 1s ease;
+}
+
+
+#resultsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 80vh; /* Adjust based on your layout */
+    overflow-y: auto; /* Add a vertical scrollbar */
+    padding-right: 10px; /* Add some padding for the scrollbar */
+    max-width: 50vw;
 }
 
 .image-container {
@@ -1098,6 +1156,95 @@ canvas,
     letter-spacing: 1px;
     font-family: monospace;
 }
+.top-nav {
+    display: flex;
+    justify-content: flex-end;
+    /* padding: 10px 20px; */
+    background-color: #2a2a4f;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.investor-btn {
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-left: 15px;
+}
+
+.investor-btn:hover {
+    background-color: #ff6b81;
+}
+
+
+.important-button {
+    background: #ff4757;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 15px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    z-index: 22000;
+}
+
+.important-button:hover {
+    background: #ff6b81;
+}
+.top-nav {
+    display: flex;
+    justify-content: flex-end;
+    /* padding: 10px 20px;/ */
+    background-color: #2a2a4f;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.investor-btn {
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-left: 15px;
+}
+
+.investor-btn:hover {
+    background-color: #ff6b81;
+}
+
+
+.important-button {
+    background: #ff4757;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 15px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.important-button:hover {
+    background: #ff6b81;
+}
 
 
 
@@ -1109,6 +1256,6 @@ canvas,
 #effectControls::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 20px;
-    min-height: 50px; /* Increase the height of the scrollbar thumb */
+        min-height: 50px; /* Increase the height of the scrollbar thumb */
 
 }

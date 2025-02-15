@@ -288,59 +288,20 @@ function updateObjectMask(newRegion) {
     });
 }
 
-
 function displaySelectedRegionsBorders() {
     ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
     ctx.drawImage(originalImage, 0, 0);
-    ctx.strokeStyle = 'red'; // Border color
-    ctx.lineWidth = 2; // Border thickness
-
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 0.1;
     selectedRegions.forEach(region => {
-        // Find the boundary pixels of the region
-        const boundaryPixels = findBoundaryPixels(region);
-
-        // Draw the freehand border
         ctx.beginPath();
-        boundaryPixels.forEach((pixel, index) => {
-            const x = pixel % imageCanvas.width;
-            const y = Math.floor(pixel / imageCanvas.width);
-            if (index === 0) {
-                ctx.moveTo(x, y); // Move to the first pixel
-            } else {
-                ctx.lineTo(x, y); // Draw a line to the next pixel
-            }
+        region.forEach(pixelIndex => {
+            const x = pixelIndex % imageCanvas.width;
+            const y = Math.floor(pixelIndex / imageCanvas.width);
+            ctx.rect(x, y, 1, 1);
         });
-        ctx.closePath(); // Close the path to complete the border
-        ctx.stroke(); // Render the border
+        ctx.stroke();
     });
-}
-
-// Helper function to find boundary pixels of the selected region
-function findBoundaryPixels(region) {
-    const boundaryPixels = [];
-    const visited = new Set();
-
-    region.forEach(pixelIndex => {
-        const x = pixelIndex % imageCanvas.width;
-        const y = Math.floor(pixelIndex / imageCanvas.width);
-
-        // Check all 8 neighboring pixels
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-                if (dx === 0 && dy === 0) continue; // Skip the current pixel
-                const neighborIndex = (y + dy) * imageCanvas.width + (x + dx);
-
-                // If the neighbor is not part of the region, this pixel is a boundary pixel
-                if (!region.includes(neighborIndex)) {
-                    boundaryPixels.push(pixelIndex);
-                    visited.add(pixelIndex);
-                    break;
-                }
-            }
-        }
-    });
-
-    return boundaryPixels;
 }
 
 function startResizing() {

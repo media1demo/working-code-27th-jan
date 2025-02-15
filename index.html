@@ -13,10 +13,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video generator</title>
-    <meta name="description" content="Generate high-quality videos and animations effortlessly without heavy software and without GPU. Perfect for content creators, marketers, and designers.">
-    <meta name="keywords" content="video generator, animation tool, create videos, video editing, online video maker, image to animaiton">
-    <meta name="author" content="Imagine a store">
-
     <link rel="stylesheet" href="styles2.css">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
     <script src = "effects.js"></script>
@@ -25,9 +21,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
 </head>
-        <h1 style="display: none;">Image to Animation without GPU</h1>
-    <p style= "display:none">Create stunning videos and animations with ease using our powerful video generator tool without heavy software</p>
-
+<h1 style="display: none;">Image to Animation without GPU</h1>
 <body>
 
     <div id="contactBar" style="
@@ -58,22 +52,18 @@
    </div>
         <button id="closeVideoModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
     </div>
-
-
     <div id="pricingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1100; justify-content: center; align-items: center;">
         <div id="modalContent" style="background: #2a2a4f; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto; display: flex; gap: 20px; flex-wrap: nowrap; min-width: 80%;">
             <!-- Content from pricing.html will be inserted here -->
         </div>
         <button id="closeModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
     </div>
-
     <div class="top-nav">
         <div id="creditSystem">
             <div id="creditBalance">Credits: 0</div>
             <button id="buyCredits">Buy Credits</button>
             <button id="startFreeTrial">Start Free Trial</button>
         </div>
-
     </div>
     <div class="top-centered-container">
         <button id="investorRelations" class="centered-button">
@@ -88,9 +78,7 @@
     <div id="searchBarContainer">
         <input type="text" id="effectSearchBar" placeholder="Search for effects...">
     </div>
-    
     <div id="sidebar">
-        
         <button id = "magicWandTool" style="display: none;">.</button>
      <button id="lassoTool">Lasso Tool</button>
          <button id="polygonLassoTool">Polygon Lasso Tool</button> <!-- New button -->
@@ -146,6 +134,7 @@
             <input type="number" id="value5" value="0">
             <button id="fastProcessButton">Fast Process</button>
         </div>
+        
         <div id="selectAllCheckboxControl">
             <input type="checkbox" id="selectAllCheckbox">
             <label for="selectAllCheckbox">Select All Effects</label>
@@ -7044,37 +7033,6 @@ Promise.allSettled(
     console.error('Overall worker processing error:', error);
 });
 
-// // Modified sequential animation function for continuous animation
-// function startSequentialAnimation() {
-//     let currentIndex = 0;
-    
-//     // First hide all images
-//     generatedImages.forEach(item => {
-//         item.wrapper.classList.remove('active');
-//     });
-
-//     function showNextImage() {
-//         // Hide current image
-//         if (currentIndex > 0) {
-//             generatedImages[currentIndex - 1].wrapper.classList.remove('active');
-//         } else {
-//             // When starting a new cycle, hide the last image
-//             generatedImages[generatedImages.length - 1].wrapper.classList.remove('active');
-//         }
-
-//         // Show next image
-//         generatedImages[currentIndex].wrapper.classList.add('active');
-
-//         // Increment counter
-//         currentIndex = (currentIndex + 1) % generatedImages.length;
-
-//         // Schedule next image - animation continues indefinitely
-//         setTimeout(showNextImage, 200);
-//     }
-
-//     // Start the sequence
-//     showNextImage();
-// }
 
 function startSequentialAnimation() {
     // Create a canvas for combining images

@@ -22,18 +22,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
 </head>
 <h1 style="display: none;">Image to Animation without GPU</h1>
+
 <body>
+    <div class="hamburger-menu">
+        <button class="hamburger-button">☰</button>
+        <div class="dropdown-content">
+            <button id="refundBtn">Refund Policy</button>
+            <button id="policyBtn">Privacy Policy</button>
+            <button id="tncBtn">Terms & Conditions</button>
+        </div>
+    </div>
+
 
     <div id="contactBar" style="
-    background: #1a1a2e;
-    color: white;
-    padding: 2px;
-    text-align: center;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-">
+        background: #1a1a2e;
+        color: white;
+        padding: 2px;
+        text-align: center;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+    ">
     Contact us: <a href="mailto:stejas809@gmail.com" style="color: white; text-decoration: none;">stejas809@gmail.com</a> | 
     Phone: <a href="tel:+918850362898" style="color: white; text-decoration: none;">+91-8850362898</a>
 </div>
@@ -53,7 +63,7 @@
         <button id="closeVideoModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
     </div>
     <div id="pricingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1100; justify-content: center; align-items: center;">
-        <div id="modalContent" style="background: #2a2a4f; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto; display: flex; gap: 20px; flex-wrap: nowrap; min-width: 80%;">
+        <div id="modalContent" style="background: #000000; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto; display: flex; gap: 20px; flex-wrap: nowrap; min-width: 80%;">
             <!-- Content from pricing.html will be inserted here -->
         </div>
         <button id="closeModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
@@ -66,9 +76,9 @@
         </div>
     </div>
     <div class="top-centered-container">
-<!--         <button id="investorRelations" class="centered-button">
+        <button id="investorRelations" class="centered-button">
             Investor Relations
-        </button> -->
+        </button>
     </div>
     <img id="sourceImage" crossorigin="anonymous" style="display: none;">
     <div id="mainContainer" style="display: none;">
@@ -174,10 +184,11 @@
                 <img id="segmentedImage" alt="Segmented Image" style ="display: none;">
             </div>
         </div> -->
+    
     </div>
 
     <div id="effectControls"></div>
-<script src= "main.js"></script>
+    <script src= "main.js"></script>
 
 <script>
 
@@ -466,7 +477,7 @@ function useCredits() {
     `,
 
     initialize() {
-        // Add styles to document
+
         const styleSheet = document.createElement('style');
         styleSheet.textContent = this.styles;
         document.head.appendChild(styleSheet);
@@ -632,10 +643,6 @@ if (freeTrialInterval === null) {
             });
         });
     }); 
-
-    // document.getElementById('investorRelations').addEventListener('click', function() {
-//     window.open('banner.html', '_blank');
-// });
 
 document.getElementById('investorRelations').addEventListener('click', function() {
     // Find the iframe in your document
@@ -1297,6 +1304,47 @@ function trackVisits() {
 
 // Initialize and start the tutorial
 document.addEventListener('DOMContentLoaded', () => {
+
+    const hamburgerBtn = document.querySelector('.hamburger-button');
+            const dropdownContent = document.querySelector('.dropdown-content');
+
+            // Routes for the pages
+            const routes = {
+                refund: 'https://tejas36026.github.io/working-code-27th-jan/refund.html',
+                policy: 'https://tejas36026.github.io/working-code-27th-jan/policy.html',
+                tnc: 'https://tejas36026.github.io/working-code-27th-jan/TnC.html'
+            };
+
+            // Toggle hamburger menu
+            hamburgerBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdownContent.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+
+            // Setup route buttons
+            document.getElementById('refundBtn').addEventListener('click', () => {
+                window.location.href = routes.refund;
+                dropdownContent.classList.remove('show');
+            });
+
+            document.getElementById('policyBtn').addEventListener('click', () => {
+                window.location.href = routes.policy;
+                dropdownContent.classList.remove('show');
+            });
+
+            document.getElementById('tncBtn').addEventListener('click', () => {
+                window.location.href = routes.tnc;
+                dropdownContent.classList.remove('show');
+            });
+
+
     const tutorialButton = document.createElement('button');
     tutorialButton.style.display = "none";
     tutorialButton.textContent = 'Start Interactive Tutorial';
@@ -5895,7 +5943,6 @@ function startProcessing(processType) {
     if (!segmentationResult) {
         alert('Segmentation not ready. Please wait.');
         return;
-
     }
     count = 1    
     // Clear imageArray before starting new processing

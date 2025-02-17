@@ -472,6 +472,44 @@ function applyEffect(effect, imageData, value, selectedRegions) {
 }
 
 
+// function displayEffectButtons() {
+//     const searchTerm = effectSearchBar.value.toLowerCase();
+    
+//     // Clear existing buttons first
+//     Array.from(effectControls.children).forEach(child => {
+//         if (child.tagName !== 'DIV') {
+//             child.remove();
+//         }
+//     });
+
+//     // Create buttons for filtered effects
+//     effects.forEach(effect => {
+//         const checkbox = document.getElementById(`${effect}Checkbox`);
+//         if (!checkbox || !checkbox.checked) return;
+
+//         const button = document.createElement('button');
+//         button.className = 'effect-button';
+//         button.textContent = effect;
+//         button.dataset.effect = effect;
+//         button.dataset.active = 'true';
+        
+//         // Check if effect matches search term
+//         if (searchTerm && !effect.toLowerCase().includes(searchTerm)) {
+//             button.style.display = 'none';
+//         }
+
+//         button.addEventListener('mouseenter', () => displayEffectImages(effect));
+//         button.addEventListener('click', () => {
+//             toggleEffect(button);
+//             displayEffectImages(effect);
+//         });
+
+//         const checkboxDiv = checkbox.closest('.effect-control');
+//         checkboxDiv.insertAdjacentElement('afterend', button);
+//     });
+// }
+
+
 function displayEffectButtons() {
     const searchTerm = effectSearchBar.value.toLowerCase();
     
@@ -481,12 +519,20 @@ function displayEffectButtons() {
             child.remove();
         }
     });
-
+    
     // Create buttons for filtered effects
     effects.forEach(effect => {
         const checkbox = document.getElementById(`${effect}Checkbox`);
-        if (!checkbox || !checkbox.checked) return;
-
+        if (!checkbox) return;
+        
+        // Hide the checkbox and label
+        const checkboxContainer = checkbox.parentElement;
+        if (checkboxContainer) {
+            const label = checkboxContainer.querySelector('label');
+            if (label) label.style.display = 'none';
+            checkbox.style.display = 'none';
+        }
+        
         const button = document.createElement('button');
         button.className = 'effect-button';
         button.textContent = effect;
@@ -497,17 +543,18 @@ function displayEffectButtons() {
         if (searchTerm && !effect.toLowerCase().includes(searchTerm)) {
             button.style.display = 'none';
         }
-
+        
         button.addEventListener('mouseenter', () => displayEffectImages(effect));
         button.addEventListener('click', () => {
             toggleEffect(button);
             displayEffectImages(effect);
         });
-
+        
         const checkboxDiv = checkbox.closest('.effect-control');
         checkboxDiv.insertAdjacentElement('afterend', button);
     });
 }
+
 function initializeEffectControls() {
     const effectControls = document.getElementById('effectControls');
     
@@ -937,15 +984,15 @@ shareIcon.addEventListener('click', async (event) => {
 
 
 
-async function loadWatermarkLogo(logoPath) {
-    return new Promise((resolve, reject) => {
-      const logo = new Image();
-      logo.crossOrigin = "anonymous";
-      logo.onload = () => resolve(logo);
-      logo.onerror = (error) => reject(new Error(`Failed to load logo: ${error.message}`));
-      logo.src = logoPath;
-    });
-  }
+    async function loadWatermarkLogo(logoPath) {
+        return new Promise((resolve, reject) => {
+        const logo = new Image();
+        logo.crossOrigin = "anonymous";
+        logo.onload = () => resolve(logo);
+        logo.onerror = (error) => reject(new Error(`Failed to load logo: ${error.message}`));
+        logo.src = logoPath;
+        });
+    }
 
   async function loadImage(dataUrl) {
     return new Promise((resolve, reject) => {
@@ -988,17 +1035,7 @@ async function loadWatermarkLogo(logoPath) {
     return canvas;
   }
 
-  
               // Helper Functions
-         
-              
-            //   function loadImage(dataUrl) {
-            //     return new Promise((resolve) => {
-            //       const tempImg = new Image();
-            //       tempImg.onload = () => resolve(tempImg);
-            //       tempImg.src = dataUrl;
-            //     });
-            //   }
               
               function createWatermarkedFrame(image, logo) {
                 const canvas = document.createElement('canvas');
@@ -1079,9 +1116,11 @@ async function loadWatermarkLogo(logoPath) {
 }
 
 async function processImage(img) {
+
     setInterval(() => {
         displayFinishedAnimations();
     }, 3000);
+    
     processedImages = {};
     animationStatus = {};
 
@@ -1195,7 +1234,6 @@ async function processImage(img) {
         // If no generated images, process original image with variations
         else if (img instanceof HTMLImageElement) {
          
-
             for (let i = 0; i < defaultImageCount; i++) {
                 try {
                     const canvas = document.createElement('canvas');
@@ -1206,8 +1244,7 @@ async function processImage(img) {
                     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     
                     let value = getEffectValue(effect, i, defaultImageCount);
-                    // // console.log(`Processing original image variation ${i + 1}/${defaultImageCount}`);
-                    
+           
                     const processedImageData = await applyEffect(effect, imageData, value, selectedRegions);
                     
                     const resultCanvas = document.createElement('canvas');
@@ -1264,6 +1301,7 @@ async function processImage(img) {
                     // if (Date.now() - processStartTime >= 3000) {
                     //     displayFinishedAnimations();
                     // }
+                    
                 } catch (error) {
                     console.error(`Error processing original image variation ${i + 1}:`, error);
                 }

@@ -656,7 +656,7 @@ button {
 
 /* Effect Controls */
 #effectControls .effect-control {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     display: flex;
     align-items: center;
     box-shadow:#00a8ff
@@ -791,12 +791,67 @@ button {
 }
 
 .effect-button.active {
-    /* background-color: #4CAF50;  */
-    /* background: #0056b3; */
 box-shadow: #00a8ff;
     color: white;
 }
+#effect-button processed {
 
+box-shadow: #0056b3;
+
+}
+
+.effect-button.processed {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(145deg, #2193b0, #6dd5ed);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: capitalize;
+    box-shadow: 0 2px 4px rgba(0, 168, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.effect-button.processed[data-active="true"] {
+    background: linear-gradient(145deg, #1a7b94, #5bbad1);
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 168, 255, 0.3);
+}
+
+.effect-button.processed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 168, 255, 0.3);
+}
+
+.effect-button.processed:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 168, 255, 0.3);
+}
+
+/* Optional: Add a subtle shine effect */
+.effect-button.processed::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0)
+    );
+    transform: rotate(45deg);
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.effect-button.processed:hover::after {
+    opacity: 1;
+}
 .effect-button.inactive {
     background-color: #f0f0f0; /* Light gray when inactive */
     color: #333;
@@ -930,6 +985,60 @@ width: 350px !important;
 .imageCanvas.lasso-active {
     border: 2px dashed yellow;
 }
+
+
+
+
+.hamburger-menu {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 1200;
+}
+
+.hamburger-button {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    min-width: 200px;
+    border-radius: 4px;
+    padding: 8px 0;
+    margin-top: 5px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content button {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.dropdown-content button:hover {
+    background-color: rgba(33, 150, 243, 0.2);
+}
+
+
 
 #polygonLassoButton.active {
     background-color: #ffeb3b;
@@ -1110,7 +1219,6 @@ canvas,
 #progress {
     animation: fadeIn 1s ease;
 }
-
 
 #resultsContainer {
     display: flex;

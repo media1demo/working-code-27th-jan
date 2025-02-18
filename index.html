@@ -241,6 +241,7 @@ function startContinuousPaymentCheck() {
     // Set up interval to check payment every minute
     paymentCheckInterval = setInterval(() => {
         console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
+        alert("cont....")
         checkPaymentStatus();
         
         // Check if we've been monitoring for 15 minutes
@@ -607,6 +608,7 @@ document.getElementById('buyCredits').addEventListener('click', () => {
             
             paymentCheckInterval = setInterval(() => {
                 console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
+                alert("checking")
                 checkPaymentStatus();
                 
                 // Recalculate elapsed time since we're continuing from a previous session

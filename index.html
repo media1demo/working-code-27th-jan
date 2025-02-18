@@ -194,8 +194,8 @@
 
 <script>
 
-
 window.onload = () => {
+    console.log("Page loaded, checking payment status...");
     checkPaymentStatus();
     
     if (freeTrialInterval === null) {
@@ -223,11 +223,26 @@ const PRICE_PLANS = {
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
 
 
+
 function checkPaymentStatus() {
-    const urlParams = new URLSearchParams(window.location.search);
+    // Extract and clean up URL parameters
+    const urlString = window.location.href;
+    let urlParams;
+    
+    try {
+        // Fix for double question marks in URL
+        const cleanUrl = urlString.replace('/?plan=standard?', '/?plan=standard&');
+        urlParams = new URL(cleanUrl).searchParams;
+    } catch (e) {
+        console.error("Error parsing URL:", e);
+        urlParams = new URLSearchParams(window.location.search);
+    }
+    
     const subscription_id = urlParams.get('subscription_id');
     const status = urlParams.get('status');
-    const plan_type = urlParams.get('plan'); // Added a plan parameter
+    const plan_type = urlParams.get('plan'); 
+
+    console.log("Checking payment:", { subscription_id, status, plan_type });
 
     // Only process if subscription ID exists, status is active, and not already processed
     if (subscription_id && 
@@ -242,41 +257,46 @@ function checkPaymentStatus() {
             creditAmount = PRICE_PLANS[plan_type].credits;
             planName = plan_type.charAt(0).toUpperCase() + plan_type.slice(1);
         } else {
-            // Fallback method: determine plan by looking at the returned URL data
-            // This is less reliable but works if you can't modify the redirect URL
-            if (window.location.href.includes('test.checkout.dodopayments.com/buy/pdt_Wi9yels9t5RHrfN4BjxNw')) {
+            // Fallback: Check for known product IDs in URL
+            if (urlString.includes('pdt_Wi9yels9t5RHrfN4BjxNw')) {
                 creditAmount = PRICE_PLANS.basic.credits;
                 planName = "Basic";
-            } else if (window.location.href.includes('test.checkout.dodopayments.com/buy/pdt_rZHKTiJa9F6dTMJlgAdYt')) {
+            } else if (urlString.includes('pdt_rZHKTiJa9F6dTMJlgAdYt')) {
                 creditAmount = PRICE_PLANS.standard.credits;
                 planName = "Standard";
             } else {
-                // Default to basic plan if unable to determine
-                creditAmount = PRICE_PLANS.basic.credits;
-                planName = "Basic (default)";
-                console.warn("Unable to determine exact plan, defaulting to Basic plan");
+                // Second fallback: look for clues in subscription ID or URL
+                if (urlString.toLowerCase().includes('standard')) {
+                    creditAmount = PRICE_PLANS.standard.credits;
+                    planName = "Standard";
+                } else {
+                    // Default to basic as last resort
+                    creditAmount = PRICE_PLANS.basic.credits;
+                    planName = "Basic";
+                }
+                console.warn("Using heuristics to determine plan type:", planName);
             }
         }
+        
+        console.log(`Adding ${creditAmount} credits for ${planName} plan`);
         
         // Add credits
         credits += creditAmount;
         updateCreditBalance();
         
-        // Store this subscription ID to prevent double-crediting
+        // Store this subscription ID
         processedSubscriptions.push(subscription_id);
         localStorage.setItem('processedSubscriptions', JSON.stringify(processedSubscriptions));
         
         // Show success message
         alert(`Purchase successful! ${creditAmount.toLocaleString()} credits from ${planName} Plan have been added to your account.`);
         
-        // Clear URL parameters to prevent refreshing and adding credits again
+        // Clear URL parameters
         window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Optional: Log the successful payment
-        logSuccessfulPayment(subscription_id, planName, creditAmount);
+    } else if (subscription_id && processedSubscriptions.includes(subscription_id)) {
+        console.log("Subscription already processed:", subscription_id);
     }
 }
-
 function logSuccessfulPayment(subscription_id, planName, creditAmount) {
     console.log(`Payment processed: ${subscription_id}, ${planName} Plan, ${creditAmount} credits`);
     
@@ -296,6 +316,8 @@ function logSuccessfulPayment(subscription_id, planName, creditAmount) {
     });
     */
 }
+
+
 
 function useCredits() {
     const selectedEffects = effects.filter(effect => 
@@ -387,18 +409,25 @@ document.getElementById('buyCredits').addEventListener('click', () => {
             document.getElementById('modalContent').innerHTML = html;
             
 
-            document.querySelector('.basic button').addEventListener('click', function(e) {
-        e.preventDefault();
-        window.open('https://test.checkout.dodopayments.com/buy/pdt_Wi9yels9t5RHrfN4BjxNw?quantity=1&redirect_url=https://imaginea.store?plan=basic', '_blank');
-        document.getElementById('pricingModal').style.display = 'none';
-    });
-    
-    document.querySelector('.standard button').addEventListener('click', function(e) {
-        e.preventDefault();
-        window.open('https://test.checkout.dodopayments.com/buy/pdt_rZHKTiJa9F6dTMJlgAdYt?quantity=1&redirect_url=https://imaginea.store?plan=standard', '_blank');
-        document.getElementById('pricingModal').style.display = 'none';
-    });
+
+            if (document.querySelector('.basic button')) {
+        document.querySelector('.basic button').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open('https://test.checkout.dodopayments.com/buy/pdt_Wi9yels9t5RHrfN4BjxNw?quantity=1&redirect_url=https://imaginea.store/?plan=basic', '_blank');
+            document.getElementById('pricingModal').style.display = 'none';
         });
+    }
+    
+    if (document.querySelector('.standard button')) {
+        document.querySelector('.standard button').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open('https://test.checkout.dodopayments.com/buy/pdt_rZHKTiJa9F6dTMJlgAdYt?quantity=1&redirect_url=https://imaginea.store/?plan=standard', '_blank');
+            document.getElementById('pricingModal').style.display = 'none';
+        });
+    }
+
+
+});
 });
 
 

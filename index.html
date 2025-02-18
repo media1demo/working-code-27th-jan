@@ -30,6 +30,7 @@
             <button id="refundBtn">Refund Policy</button>
             <button id="policyBtn">Privacy Policy</button>
             <button id="tncBtn">Terms & Conditions</button>
+            <button id="bulkimageid"> Bulk Image generator</button>
         </div>
     </div>
 
@@ -192,8 +193,9 @@
 
 <script>
 
-
 window.onload = () => {
+    checkPaymentStatus(); // Check for payment status first
+    
     if (freeTrialInterval === null) {
         freeTrialInterval = setInterval(() => {
             credits += 2; // 2 credits every minute
@@ -202,38 +204,62 @@ window.onload = () => {
     }
 };
 
-let credits = 10000;
-let freeTrialInterval = null;
 
+let credits = parseInt(localStorage.getItem('credits')) || 10000;
+let freeTrialInterval = null;
 
 function updateCreditBalance() {
     document.getElementById('creditBalance').textContent = `Credits: ${credits}`;
     localStorage.setItem('credits', credits);
 }
 
+function checkPaymentStatus() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const subscription_id = urlParams.get('subscription_id');
+    const status = urlParams.get('status');
+
+    if (subscription_id && status === 'active') {
+        // Map subscription IDs to credit amounts
+        const creditMap = {
+            'sub_fvb0gsqJ3XYyDyFtNDfgt': 10000,    // Basic plan ($29)
+            'sub_Wq0rv5eR5JolubHreqmct': 1000000   // Standard plan ($299)
+        };
+
+        const creditAmount = creditMap[subscription_id];
+        if (creditAmount) {
+            credits += creditAmount;
+            updateCreditBalance();
+            
+            // Show success message
+            alert(`Purchase successful! ${creditAmount} credits have been added to your account.`);
+            
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
+
 
 function useCredits() {
-
     const selectedEffects = effects.filter(effect => 
         document.getElementById(`${effect}Checkbox`).checked
     ).length;
-
+    
     const imageCount = parseInt(document.getElementById('imageCount').value) || 3;
-
+    
     const totalCreditsRequired = selectedEffects * imageCount;
-
+    
     if (credits >= totalCreditsRequired) {
-      
-        
-        credits -= totalCreditsRequired; // Deduct the total credits
+        credits -= totalCreditsRequired;
         console.log('credits :>> ', credits);
         updateCreditBalance();
-        return true; // Credits were successfully deducted
+        return true;
     } else {
         alert(`Not enough credits! You need ${totalCreditsRequired} credits but only have ${credits}.`);
-        return false; // Not enough credits
+        return false;
     }
 }
+
 
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -241,7 +267,7 @@ function useCredits() {
             resetHoverTimeout();
     
 
-            document.querySelectorAll('.effect-button').forEach(button => {
+    document.querySelectorAll('.effect-button').forEach(button => {
     button.addEventListener('mouseenter', () => {
         resetHoverTimeout();
         displayEffectImages(button.dataset.effect);
@@ -601,7 +627,7 @@ const effectSearchBar = document.getElementById('effectSearchBar');
 effectSearchBar.addEventListener('input', filterEffects);
 
 // Initialize credits to 10000 if no value is stored in localStorage
-credits = parseInt(localStorage.getItem('credits')) || 10000;
+// credits = parseInt(localStorage.getItem('credits')) || 10000;
 updateCreditBalance();
 
 if (freeTrialInterval === null) {
@@ -612,13 +638,9 @@ if (freeTrialInterval === null) {
 }
 
 
-
-    document.getElementById('buyCredits').addEventListener('click', () => {
-    // Show pricing modal
+document.getElementById('buyCredits').addEventListener('click', () => {
     document.getElementById('pricingModal').style.display = 'flex';
     
-
-
     // Load pricing content dynamically
     fetch('pricing.html')
         .then(response => response.text())
@@ -628,21 +650,18 @@ if (freeTrialInterval === null) {
             // Add event listeners to pricing buttons
             document.querySelector('.basic button').addEventListener('click', function(e) {
                 e.preventDefault();
-                credits += 10000;
-                updateCreditBalance();
-                // window.open(this.getAttribute('href'), '_blank');
+                window.open('https://test.checkout.dodopayments.com/buy/pdt_Wi9yels9t5RHrfN4BjxNw?quantity=1&redirect_url=https://imaginea.store', '_blank');
                 document.getElementById('pricingModal').style.display = 'none';
             });
             
             document.querySelector('.standard button').addEventListener('click', function(e) {
                 e.preventDefault();
-                credits += 1000000;
-                updateCreditBalance();
-                // window.open(this.getAttribute('href'), '_blank');
+                window.open('https://test.checkout.dodopayments.com/buy/pdt_rZHKTiJa9F6dTMJlgAdYt?quantity=1&redirect_url=https://imaginea.store', '_blank');
                 document.getElementById('pricingModal').style.display = 'none';
             });
         });
-    }); 
+});
+
 
 document.getElementById('investorRelations').addEventListener('click', function() {
     // Find the iframe in your document
@@ -1312,7 +1331,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const routes = {
                 refund: 'https://tejas36026.github.io/working-code-27th-jan/refund.html',
                 policy: 'https://tejas36026.github.io/working-code-27th-jan/policy.html',
-                tnc: 'https://tejas36026.github.io/working-code-27th-jan/TnC.html'
+                tnc: 'https://tejas36026.github.io/working-code-27th-jan/TnC.html',
+                bulkimageid: 'https://tejas36026.github.io/working-code-27th-jan/bulkimagegenerator.html'
             };
 
             // Toggle hamburger menu
@@ -1341,6 +1361,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('tncBtn').addEventListener('click', () => {
                 window.location.href = routes.tnc;
+                dropdownContent.classList.remove('show');
+            });
+            document.getElementById('bulkimageid').addEventListener('click', () => {
+                window.location.href = routes.bulkimageid;
                 dropdownContent.classList.remove('show');
             });
 

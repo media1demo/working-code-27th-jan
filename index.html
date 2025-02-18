@@ -222,33 +222,92 @@ const PRICE_PLANS = {
 
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
 
+let paymentCheckInterval = null;
+const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+const PAYMENT_CHECK_FREQUENCY = 60 * 1000; // 1 minute in milliseconds
+
+
+function startContinuousPaymentCheck() {
+    // Clear any existing interval first
+    if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+    }
+    
+    // Log the start of payment monitoring
+    const startTime = new Date();
+    console.log(`Started payment monitoring at ${startTime.toLocaleTimeString()}`);
+    localStorage.setItem('paymentMonitoringStarted', startTime.getTime());
+    
+    // Set up interval to check payment every minute
+    paymentCheckInterval = setInterval(() => {
+        console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
+        checkPaymentStatus();
+        
+        // Check if we've been monitoring for 15 minutes
+        const elapsedTime = new Date().getTime() - startTime.getTime();
+        if (elapsedTime >= PAYMENT_CHECK_DURATION) {
+            stopContinuousPaymentCheck();
+        }
+    }, PAYMENT_CHECK_FREQUENCY);
+    
+    // Also set a timeout to ensure we stop after 15 minutes (as a backup)
+    setTimeout(() => {
+        stopContinuousPaymentCheck();
+    }, PAYMENT_CHECK_DURATION);
+}
+
+
+function stopContinuousPaymentCheck() {
+    if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+        paymentCheckInterval = null;
+        console.log(`Stopped payment monitoring at ${new Date().toLocaleTimeString()}`);
+        localStorage.removeItem('paymentMonitoringStarted');
+    }
+}
 
 
 function checkPaymentStatus() {
     // Extract and clean up URL parameters
     const urlString = window.location.href;
     let urlParams;
-    
+    console.log("Raw URL:", urlString);
+    console.log("Checking payment status at:", new Date().toISOString());
+
+
+
     try {
-        // Fix for double question marks in URL
-        const cleanUrl = urlString.replace('/?plan=standard?', '/?plan=standard&');
+        // Fix for any malformed URL parameters
+        const cleanUrl = urlString
+            .replace(/\?plan=([^?&]+)\?/, '?plan=$1&')
+            .replace(/&&/g, '&');
         urlParams = new URL(cleanUrl).searchParams;
     } catch (e) {
         console.error("Error parsing URL:", e);
         urlParams = new URLSearchParams(window.location.search);
     }
+
     
     const subscription_id = urlParams.get('subscription_id');
     const status = urlParams.get('status');
     const plan_type = urlParams.get('plan'); 
 
     console.log("Checking payment:", { subscription_id, status, plan_type });
-
+    console.log("Parsed parameters:", {
+        subscription_id,
+        status,
+        plan_type,
+        fullURL: window.location.href,
+        searchParams: window.location.search
+    });
+const wasProcessed = processedSubscriptions.includes(subscription_id);
+    
     // Only process if subscription ID exists, status is active, and not already processed
     if (subscription_id && 
         status === 'active' && 
         !processedSubscriptions.includes(subscription_id)) {
-        
+            console.log("Subscription already processed:", subscription_id);
+
         let creditAmount, planName;
         
         // Determine which plan was purchased
@@ -401,7 +460,9 @@ if (freeTrialInterval === null) {
 
 document.getElementById('buyCredits').addEventListener('click', () => {
     document.getElementById('pricingModal').style.display = 'flex';
-    
+
+    startContinuousPaymentCheck();
+
     // Load pricing content dynamically
     fetch('pricing.html')
         .then(response => response.text())
@@ -429,6 +490,8 @@ document.getElementById('buyCredits').addEventListener('click', () => {
 
 });
 });
+
+
 
 
     document.getElementById('investorRelations').addEventListener('click', function() {
@@ -528,6 +591,44 @@ document.getElementById('buyCredits').addEventListener('click', () => {
     });
 
     });
+
+
+    window.addEventListener('load', () => {
+    const monitoringStartTime = localStorage.getItem('paymentMonitoringStarted');
+    
+    if (monitoringStartTime) {
+        const startTime = parseInt(monitoringStartTime);
+        const elapsedTime = new Date().getTime() - startTime;
+        
+        // If we're still within the 15-minute window, resume monitoring
+        if (elapsedTime < PAYMENT_CHECK_DURATION) {
+            const remainingTime = PAYMENT_CHECK_DURATION - elapsedTime;
+            console.log(`Resuming payment monitoring for remaining ${Math.round(remainingTime/60000)} minutes`);
+            
+            paymentCheckInterval = setInterval(() => {
+                console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
+                checkPaymentStatus();
+                
+                // Recalculate elapsed time since we're continuing from a previous session
+                const currentElapsedTime = new Date().getTime() - startTime;
+                if (currentElapsedTime >= PAYMENT_CHECK_DURATION) {
+                    stopContinuousPaymentCheck();
+                }
+            }, PAYMENT_CHECK_FREQUENCY);
+            
+            // Set timeout for the remaining time
+            setTimeout(() => {
+                stopContinuousPaymentCheck();
+            }, remainingTime);
+        } else {
+            // Clean up if we're past the monitoring window
+            localStorage.removeItem('paymentMonitoringStarted');
+        }
+    }
+});   
+
+
+
 
 
 function trackVisits() {

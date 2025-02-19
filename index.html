@@ -224,7 +224,7 @@ let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscript
 
 let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
-const PAYMENT_CHECK_FREQUENCY = 60 * 300; // 1 minute in milliseconds
+const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 1 minute in milliseconds
 
 
 function startContinuousPaymentCheck() {

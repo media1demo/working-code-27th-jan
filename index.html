@@ -221,41 +221,70 @@ const PRICE_PLANS = {
 };
 
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
-alert("doing")
+
 let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 1 minute in milliseconds
 
 
 function startContinuousPaymentCheck() {
-    // Clear any existing interval first
     if (paymentCheckInterval) {
         clearInterval(paymentCheckInterval);
     }
-    
-    // Log the start of payment monitoring
+
     const startTime = new Date();
     console.log(`Started payment monitoring at ${startTime.toLocaleTimeString()}`);
-    localStorage.setItem('paymentMonitoringStarted', startTime.getTime());
-    
-    // Set up interval to check payment every minute
+
+    // Function to check payment status via iframe
+    function checkIframePaymentStatus() {
+        try {
+            // Create an iframe to check imaginea.store URL
+            const checkFrame = document.createElement('iframe');
+            checkFrame.style.display = 'none';
+            checkFrame.src = 'https://imaginea.store';
+            
+            checkFrame.onload = function() {
+                try {
+                    // Try to access the URL from the iframe
+                    const iframeUrl = checkFrame.contentWindow.location.href;
+                    console.log('Checking URL:', iframeUrl);
+                    alert('iframeurl' + iframeUrl)
+                    if (iframeUrl.includes('subscription_id') && iframeUrl.includes('status=active')) {
+                        checkPaymentStatus(iframeUrl);
+                    }
+                } catch (e) {
+                    console.log('Cannot access iframe URL directly due to same-origin policy');
+                }
+                
+                // Clean up the check iframe
+                document.body.removeChild(checkFrame);
+            };
+
+            document.body.appendChild(checkFrame);
+        } catch (error) {
+            console.error('Error checking payment status:', error);
+        }
+    }
+
+    // Initial check
+    checkIframePaymentStatus();
+
+    // Set up interval
     paymentCheckInterval = setInterval(() => {
-        console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
-        alert("cont....")
-        checkPaymentStatus();
+        checkIframePaymentStatus();
         
-        // Check if we've been monitoring for 15 minutes
         const elapsedTime = new Date().getTime() - startTime.getTime();
         if (elapsedTime >= PAYMENT_CHECK_DURATION) {
             stopContinuousPaymentCheck();
         }
     }, PAYMENT_CHECK_FREQUENCY);
-    
-    // Also set a timeout to ensure we stop after 15 minutes (as a backup)
+
+    // Ensure we stop after 15 minutes
     setTimeout(() => {
         stopContinuousPaymentCheck();
     }, PAYMENT_CHECK_DURATION);
 }
+
 
 
 function stopContinuousPaymentCheck() {
@@ -263,100 +292,58 @@ function stopContinuousPaymentCheck() {
         clearInterval(paymentCheckInterval);
         paymentCheckInterval = null;
         console.log(`Stopped payment monitoring at ${new Date().toLocaleTimeString()}`);
-        localStorage.removeItem('paymentMonitoringStarted');
     }
 }
 
-
-function checkPaymentStatus() {
-    // Extract and clean up URL parameters
-    const urlString = window.location.href;
+function checkPaymentStatus(urlString) {
+    console.log(`Checking payment status for URL: ${urlString}`);
+    
     let urlParams;
-    console.log("Raw URL:", urlString);
-    console.log("Checking payment status at:", new Date().toISOString());
-
-
-alert(urlString)
     try {
-        // Fix for any malformed URL parameters
-        const cleanUrl = urlString
-            .replace(/\?plan=([^?&]+)\?/, '?plan=$1&')
-            .replace(/&&/g, '&');
+        // Clean up URL format
+        const cleanUrl = urlString.replace('/?plan=standard?', '/?plan=standard&');
         urlParams = new URL(cleanUrl).searchParams;
     } catch (e) {
         console.error("Error parsing URL:", e);
-        urlParams = new URLSearchParams(window.location.search);
+        urlParams = new URLSearchParams(urlString.split('?')[1]);
     }
-
     
     const subscription_id = urlParams.get('subscription_id');
     const status = urlParams.get('status');
-    const plan_type = urlParams.get('plan'); 
-
-    console.log("Checking payment:", { subscription_id, status, plan_type });
-    console.log("Parsed parameters:", {
-        subscription_id,
-        status,
-        plan_type,
-        fullURL: window.location.href,
-        searchParams: window.location.search
-    });
-const wasProcessed = processedSubscriptions.includes(subscription_id);
+    const plan_type = urlParams.get('plan');
     
-    // Only process if subscription ID exists, status is active, and not already processed
+    console.log("Payment parameters:", { subscription_id, status, plan_type });
+    
     if (subscription_id && 
         status === 'active' && 
         !processedSubscriptions.includes(subscription_id)) {
-            console.log("Subscription already processed:", subscription_id);
-
+        
         let creditAmount, planName;
         
-        // Determine which plan was purchased
         if (plan_type && PRICE_PLANS[plan_type]) {
-            // If plan type is specified in URL
             creditAmount = PRICE_PLANS[plan_type].credits;
             planName = plan_type.charAt(0).toUpperCase() + plan_type.slice(1);
         } else {
-            // Fallback: Check for known product IDs in URL
-            if (urlString.includes('pdt_Wi9yels9t5RHrfN4BjxNw')) {
-                creditAmount = PRICE_PLANS.basic.credits;
-                planName = "Basic";
-            } else if (urlString.includes('pdt_rZHKTiJa9F6dTMJlgAdYt')) {
-                creditAmount = PRICE_PLANS.standard.credits;
-                planName = "Standard";
-            } else {
-                // Second fallback: look for clues in subscription ID or URL
-                if (urlString.toLowerCase().includes('standard')) {
-                    creditAmount = PRICE_PLANS.standard.credits;
-                    planName = "Standard";
-                } else {
-                    // Default to basic as last resort
-                    creditAmount = PRICE_PLANS.basic.credits;
-                    planName = "Basic";
-                }
-                console.warn("Using heuristics to determine plan type:", planName);
-            }
+            // Default to standard plan
+            creditAmount = PRICE_PLANS.standard.credits;
+            planName = "Standard";
         }
         
         console.log(`Adding ${creditAmount} credits for ${planName} plan`);
         
-        // Add credits
         credits += creditAmount;
         updateCreditBalance();
         
-        // Store this subscription ID
         processedSubscriptions.push(subscription_id);
         localStorage.setItem('processedSubscriptions', JSON.stringify(processedSubscriptions));
         
-        // Show success message
         alert(`Purchase successful! ${creditAmount.toLocaleString()} credits from ${planName} Plan have been added to your account.`);
         
-        // Clear URL parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (subscription_id && processedSubscriptions.includes(subscription_id)) {
-        console.log("Subscription already processed:", subscription_id);
+        stopContinuousPaymentCheck();
     }
 }
+
+
 function logSuccessfulPayment(subscription_id, planName, creditAmount) {
     console.log(`Payment processed: ${subscription_id}, ${planName} Plan, ${creditAmount} credits`);
     

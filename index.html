@@ -276,7 +276,7 @@ function checkPaymentStatus() {
     console.log("Checking payment status at:", new Date().toISOString());
 
 
-
+alert(urlString)
     try {
         // Fix for any malformed URL parameters
         const cleanUrl = urlString
@@ -608,7 +608,7 @@ document.getElementById('buyCredits').addEventListener('click', () => {
             
             paymentCheckInterval = setInterval(() => {
                 console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
-                alert("checking")
+            
                 checkPaymentStatus();
                 
                 // Recalculate elapsed time since we're continuing from a previous session

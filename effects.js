@@ -731,9 +731,222 @@ async function fastProcessImage(img, existingGeneratedImages = []) {
 
 sourceImages = [];
 
+
+function addDownloadAllButton() {
+    // Check if there's already a download all button to avoid duplicates
+    if (document.getElementById('download-all-btn')) return;
+    
+    // Create the button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'download-all-container';
+    buttonContainer.style.cssText = 'text-align: center; margin: 20px 0; width: 100%;';
+    
+    // Create the button
+    const downloadAllBtn = document.createElement('button');
+    downloadAllBtn.id = 'download-all-btn';
+    downloadAllBtn.className = 'download-all-btn';
+    downloadAllBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" style="margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download All Animations
+    `;
+    downloadAllBtn.style.cssText = `
+        background-color: #4a5568;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        transition: background-color 0.2s;
+    `;
+    
+    // Hover effect
+    downloadAllBtn.onmouseover = () => { downloadAllBtn.style.backgroundColor = '#2d3748'; };
+    downloadAllBtn.onmouseout = () => { downloadAllBtn.style.backgroundColor = '#4a5568'; };
+    
+    // Add click handler
+    downloadAllBtn.addEventListener('click', handleDownloadAllAnimations);
+    
+    // Add the button to the container
+    buttonContainer.appendChild(downloadAllBtn);
+    
+    // Insert at the top of the results container
+    resultsContainer.insertBefore(buttonContainer, resultsContainer.firstChild);
+}
+
+function createWatermarkedFrame(image, logo) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = image.width;
+    canvas.height = image.height;
+    
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0);
+    
+    const logoSize = {
+      width: image.width * 0.1,
+      height: image.height * 0.05
+    };
+    
+    ctx.drawImage(logo, 
+      canvas.width - logoSize.width - 10,
+      canvas.height - logoSize.height - 10,
+      logoSize.width, 
+      logoSize.height
+    );
+    
+    return canvas;
+  }
+       
+// Function to handle downloading all animations
+async function handleDownloadAllAnimations() {
+    const btn = document.getElementById('download-all-btn');
+    const originalContent = btn.innerHTML;
+    
+    // Show loading state
+    btn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Preparing downloads...
+    `;
+    btn.disabled = true;
+    
+    try {
+        // Load the logo for watermarking once
+        const logo = await new Promise((resolve, reject) => {
+            const logoImg = new Image();
+            logoImg.crossOrigin = "anonymous";
+            logoImg.onload = () => resolve(logoImg);
+            logoImg.onerror = reject;
+            logoImg.src = 'logo1.jpg';
+        });
+        
+        // Create a zip file
+        const zip = new JSZip();
+        
+        // Get all effects with completed animations
+        const availableEffects = effects.filter(effect => 
+            animationStatus[effect] && processedImages[effect]?.length > 0
+        );
+        
+        if (availableEffects.length === 0) {
+            throw new Error('No animations available to download');
+        }
+        
+        // Update button text with count
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            </svg>
+            Processing 0/${availableEffects.length} animations...
+        `;
+        
+        // Process each effect
+        for (let i = 0; i < availableEffects.length; i++) {
+            const effect = availableEffects[i];
+            
+            // Update progress
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                Processing ${i+1}/${availableEffects.length}: ${effect}...
+            `;
+            
+            // Create GIF for this effect
+            const gifBlob = await new Promise((resolve, reject) => {
+                const gif = new GIF({
+                    workers: 2,
+                    quality: 10,
+                    width: processedImages[effect][0]?.width || 400,
+                    height: processedImages[effect][0]?.height || 300,
+                    background: '#FFFFFF'
+                });
+                
+                // Load all images for this effect
+                Promise.all(processedImages[effect].map(imageData => {
+                    return new Promise((resolve) => {
+                        const tempImg = new Image();
+                        tempImg.onload = () => resolve(tempImg);
+                        tempImg.src = imageData.dataUrl;
+                    });
+                }))
+                .then(loadedImages => {
+                    // Add each frame with logo
+                    loadedImages.forEach(loadedImg => {
+                        const canvas = createWatermarkedFrame(loadedImg, logo);
+                        gif.addFrame(canvas, { delay: 200 });
+                    });
+                    
+                    // Render the GIF
+                    gif.on('finished', resolve);
+                    gif.on('error', reject);
+                    gif.render();
+                })
+                .catch(reject);
+            });
+            
+            // Add the GIF to the zip file
+            zip.file(`${effect}-animation.gif`, gifBlob);
+        }
+        
+        // Generate and download the zip file
+        const zipBlob = await zip.generateAsync({type: 'blob'});
+        const zipUrl = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = zipUrl;
+        a.download = 'all-animations.zip';
+        document.body.appendChild(a);
+        a.click();
+        
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(zipUrl);
+        }, 100);
+        
+        // Reset button
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        
+    } catch (error) {
+        console.error('Error creating animations package:', error);
+        
+        // Show error state
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Error: ${error.message || 'Failed to download'}
+        `;
+        
+        // Reset after a delay
+        setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }, 3000);
+    }
+}
+
+
+
+
 function displayFinishedAnimations() {
     resultsContainer.innerHTML = ''; // Clear existing content
-
+    addDownloadAllButton();
     // Iterate through all effects
     effects.forEach(effect => {
         if (animationStatus[effect] && processedImages[effect]?.length > 0) {

@@ -235,8 +235,9 @@ function startContinuousPaymentCheck() {
     const startTime = new Date();
     console.log(`Started payment monitoring at ${startTime.toLocaleTimeString()}`);
 
-    // Function to check payment status via iframe
+    // Function to check payment status via iframehttps://imaginea.store/
     function checkIframePaymentStatus() {
+        alert("checkiframe")
         try {
             // Create an iframe to check imaginea.store URL
             const checkFrame = document.createElement('iframe');

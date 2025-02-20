@@ -215,33 +215,13 @@ const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 500; // 0.1 minute in milliseconds
 
 function checkPaymentStatus() {
-    // Use window.parent.location.href instead of window.location
-    const parentUrl = window.parent.location.href;
-    const urlParams = new URLSearchParams(new URL(parentUrl).search);
-    
-    const planParam = urlParams.get('plan');
-    const subscriptionId = urlParams.get('subscription_id');
-    const status = urlParams.get('status');
-    
-    console.log("Checking payment status from parent frame:", { parentUrl, planParam, subscriptionId, status });
-    
-    if (subscriptionId && status === 'active' && !processedSubscriptions.includes(subscriptionId)) {
-        // Valid new subscription detected
-        if (PRICE_PLANS[planParam]) {
-            // Add credits based on the plan
-            credits += PRICE_PLANS[planParam].credits;
-            console.log(`Added ${PRICE_PLANS[planParam].credits} credits for ${planParam} plan`);
-            
-            // Record this subscription as processed
-            processedSubscriptions.push(subscriptionId);
-            localStorage.setItem('processedSubscriptions', JSON.stringify(processedSubscriptions));
-            
-            // Update the UI
-            updateCreditBalance();
-            
-            // Show confirmation to user
-            alert(`Your purchase was successful! ${PRICE_PLANS[planParam].credits} credits have been added to your account.`);
-        }
+    try {
+        const newurl = window.parent.location.href;
+        console.log(newurl);
+        alert(newurl);
+    } catch (error) {
+        console.error("Cannot access parent frame URL due to same-origin policy:", error);
+        alert("Cannot access parent URL due to security restrictions");
     }
 }
 

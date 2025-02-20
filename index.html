@@ -202,6 +202,22 @@ window.onload = () => {
             updateCreditBalance();
         }, 60000);
     }
+
+    if (!paymentCheckInterval) {
+        let checkCount = 0;
+        paymentCheckInterval = setInterval(() => {
+            checkCount++;
+            console.log(`Payment check #${checkCount}`);
+            if (checkCount >= 6) { // 6 checks at 1-minute intervals
+                clearInterval(paymentCheckInterval);
+                paymentCheckInterval = null;
+                console.log("Completed payment status checks");
+            } else {
+                checkPaymentStatus();
+            }
+        }, PAYMENT_CHECK_FREQUENCY);
+    }
+
 };
 
 let credits = parseInt(localStorage.getItem('credits')) || 10000;
@@ -212,11 +228,11 @@ function updateCreditBalance() {
     localStorage.setItem('credits', credits);
 }
 
-
 const PRICE_PLANS = {
     'basic': { credits: 10000, price: 29 },     // Basic plan ($29)
     'standard': { credits: 1000000, price: 299 } // Standard plan ($299)
 };
+
 
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
 let paymentCheckInterval = null;
@@ -224,6 +240,36 @@ const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 0.1 minute in milliseconds
 
 
+function checkPaymentStatus() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = urlParams.get('plan');
+    const subscriptionId = urlParams.get('subscription_id');
+    const status = urlParams.get('status');
+    
+    console.log("Checking payment status:", { planParam, subscriptionId, status });
+    
+    if (subscriptionId && status === 'active' && !processedSubscriptions.includes(subscriptionId)) {
+        // Valid new subscription detected
+        if (PRICE_PLANS[planParam]) {
+            // Add credits based on the plan
+            credits += PRICE_PLANS[planParam].credits;
+            console.log(`Added ${PRICE_PLANS[planParam].credits} credits for ${planParam} plan`);
+            
+            // Record this subscription as processed
+            processedSubscriptions.push(subscriptionId);
+            localStorage.setItem('processedSubscriptions', JSON.stringify(processedSubscriptions));
+            
+            // Update the UI
+            updateCreditBalance();
+            
+            // Show confirmation to user
+            alert(`Your purchase was successful! ${PRICE_PLANS[planParam].credits} credits have been added to your account.`);
+            
+            // Clean up URL parameters (optional)
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
 
 
 function useCredits() {
@@ -247,12 +293,8 @@ function useCredits() {
 }
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-
-
-            resetHoverTimeout();
-    
-
+document.addEventListener('DOMContentLoaded', function() {
+    resetHoverTimeout();
     document.querySelectorAll('.effect-button').forEach(button => {
     button.addEventListener('mouseenter', () => {
         resetHoverTimeout();
@@ -261,11 +303,9 @@ function useCredits() {
 });
 
 
-            
 FTUE.initialize();
-
     
-        let modalCount = localStorage.getItem('modalCount') || 0;
+            let modalCount = localStorage.getItem('modalCount') || 0;
             if (modalCount < 2) {
                 openVideoModal('https://www.youtube.com/embed/7h8WZqMG6gU?si=E9DIW9PTURuBS2ZJ');
                 localStorage.setItem('modalCount', ++modalCount);
@@ -308,7 +348,6 @@ if (freeTrialInterval === null) {
 
 document.getElementById('buyCredits').addEventListener('click', () => {
     document.getElementById('pricingModal').style.display = 'flex';
-
     
     // Load pricing content dynamically
     fetch('pricing.html')
@@ -336,6 +375,7 @@ document.getElementById('buyCredits').addEventListener('click', () => {
 
 
 });
+
 });
 
 
@@ -371,9 +411,7 @@ document.getElementById('buyCredits').addEventListener('click', () => {
         freeTrialInterval = setInterval(() => {
             credits += 10; // 10 credits every minute
             updateCreditBalance();
-        }, 60000); // 60000 milliseconds = 1 minute
-    
-    
+        }, 60000); // 60000 milliseconds = 1 minute    
     }
     credits += 10000;
     updateCreditBalance();
@@ -438,6 +476,7 @@ document.getElementById('buyCredits').addEventListener('click', () => {
     });
 
     });
+
 
     // This part stays the same - just make sure it's passing the URL correctly
 window.addEventListener('message', function(event) {

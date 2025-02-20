@@ -194,31 +194,7 @@
 
 <script>
 
-window.onload = () => {
-    console.log("Page loaded, checking payment status...");
-    if (freeTrialInterval === null) {
-        freeTrialInterval = setInterval(() => {
-            credits += 2; // 2 credits every minute
-            updateCreditBalance();
-        }, 60000);
-    }
 
-    if (!paymentCheckInterval) {
-        let checkCount = 0;
-        paymentCheckInterval = setInterval(() => {
-            checkCount++;
-            console.log(`Payment check #${checkCount}`);
-            if (checkCount >= 6) { // 6 checks at 1-minute intervals
-                clearInterval(paymentCheckInterval);
-                paymentCheckInterval = null;
-                console.log("Completed payment status checks");
-            } else {
-                checkPaymentStatus();
-            }
-        }, PAYMENT_CHECK_FREQUENCY);
-    }
-
-};
 
 let credits = parseInt(localStorage.getItem('credits')) || 10000;
 let freeTrialInterval = null;
@@ -233,20 +209,21 @@ const PRICE_PLANS = {
     'standard': { credits: 1000000, price: 299 } // Standard plan ($299)
 };
 
-
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
 let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 0.1 minute in milliseconds
 
-
 function checkPaymentStatus() {
-    const urlParams = new URLSearchParams(window.location.search);
+    // Use window.parent.location.href instead of window.location
+    const parentUrl = window.parent.location.href;
+    const urlParams = new URLSearchParams(new URL(parentUrl).search);
+    
     const planParam = urlParams.get('plan');
     const subscriptionId = urlParams.get('subscription_id');
     const status = urlParams.get('status');
     
-    console.log("Checking payment status:", { planParam, subscriptionId, status });
+    console.log("Checking payment status from parent frame:", { parentUrl, planParam, subscriptionId, status });
     
     if (subscriptionId && status === 'active' && !processedSubscriptions.includes(subscriptionId)) {
         // Valid new subscription detected
@@ -264,13 +241,37 @@ function checkPaymentStatus() {
             
             // Show confirmation to user
             alert(`Your purchase was successful! ${PRICE_PLANS[planParam].credits} credits have been added to your account.`);
-            
-            // Clean up URL parameters (optional)
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
 }
 
+window.onload = () => {
+    console.log("Page loaded, checking payment status...");
+    checkPaymentStatus();
+    
+    if (freeTrialInterval === null) {
+        freeTrialInterval = setInterval(() => {
+            credits += 2; // 2 credits every minute
+            updateCreditBalance();
+        }, 60000);
+    }
+    
+    // Set up periodic payment checks for 15 minutes
+    if (!paymentCheckInterval) {
+        let checkCount = 0;
+        paymentCheckInterval = setInterval(() => {
+            checkCount++;
+            console.log(`Payment check #${checkCount} using parent frame URL`);
+            if (checkCount >= 6) { // 6 checks at 1-minute intervals
+                clearInterval(paymentCheckInterval);
+                paymentCheckInterval = null;
+                console.log("Completed payment status checks");
+            } else {
+                checkPaymentStatus();
+            }
+        }, PAYMENT_CHECK_FREQUENCY);
+    }
+};
 
 function useCredits() {
     const selectedEffects = effects.filter(effect => 
@@ -291,7 +292,6 @@ function useCredits() {
         return false;
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', function() {
     resetHoverTimeout();
@@ -476,7 +476,6 @@ document.getElementById('buyCredits').addEventListener('click', () => {
     });
 
     });
-
 
     // This part stays the same - just make sure it's passing the URL correctly
 window.addEventListener('message', function(event) {

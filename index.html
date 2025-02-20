@@ -196,8 +196,6 @@
 
 window.onload = () => {
     console.log("Page loaded, checking payment status...");
-    checkPaymentStatus();
-    
     if (freeTrialInterval === null) {
         freeTrialInterval = setInterval(() => {
             credits += 2; // 2 credits every minute
@@ -225,123 +223,6 @@ let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 0.1 minute in milliseconds
 
-function startContinuousPaymentCheck() {
-    if (paymentCheckInterval) {
-        clearInterval(paymentCheckInterval);
-    }
-    const startTime = new Date();
-    console.log(`Started payment monitoring at ${startTime.toLocaleTimeString()}`);
-
-    function checkIframePaymentStatus() {
-        alert("checkiframe")
-        try {
-            // Create an iframe to check imaginea.store URL
-            const checkFrame = document.createElement('iframe');
-            checkFrame.style.display = 'none';
-            checkFrame.src = 'https://imaginea.store';
-            
-            checkFrame.onload = function() {
-                try {
-                    // Try to access the URL from the iframe
-                    const iframeUrl = checkFrame.contentWindow.location.href;
-                    console.log('Checking URL:', iframeUrl);
-                    alert('iframeurl' + iframeUrl)
-                    if (iframeUrl.includes('subscription_id') && iframeUrl.includes('status=active')) {
-                        checkPaymentStatus(iframeUrl);
-                    }
-                } catch (e) {
-                    console.log('Cannot access iframe URL directly due to same-origin policy');
-                }
-                
-                // Clean up the check iframe
-                document.body.removeChild(checkFrame);
-            };
-
-            document.body.appendChild(checkFrame);
-        } catch (error) {
-            console.error('Error checking payment status:', error);
-        }
-    }
-
-    // Initial check
-    checkIframePaymentStatus();
-
-    // Set up interval
-    paymentCheckInterval = setInterval(() => {
-        checkIframePaymentStatus();
-        
-        const elapsedTime = new Date().getTime() - startTime.getTime();
-        if (elapsedTime >= PAYMENT_CHECK_DURATION) {
-            stopContinuousPaymentCheck();
-        }
-    }, PAYMENT_CHECK_FREQUENCY);
-
-    // Ensure we stop after 15 minutes
-    setTimeout(() => {
-        stopContinuousPaymentCheck();
-    }, PAYMENT_CHECK_DURATION);
-}
-
-function stopContinuousPaymentCheck() {
-    if (paymentCheckInterval) {
-        clearInterval(paymentCheckInterval);
-        paymentCheckInterval = null;
-        console.log(`Stopped payment monitoring at ${new Date().toLocaleTimeString()}`);
-    }
-}
-
-function checkPaymentStatus(urlString) {
-    console.log(`Checking payment status for URL: ${urlString}`);
-    
-    let urlParams;
-    try {
-        // Clean up URL format
-        const cleanUrl = urlString.replace('/?plan=standard?', '/?plan=standard&');
-        urlParams = new URL(cleanUrl).searchParams;
-    } catch (e) {
-        console.error("Error parsing URL:", e);
-        // urlParams = new URLSearchParams(urlString.split('?')[1]);
-    }
-    
-    const subscription_id = urlParams.get('subscription_id');
-    const status = urlParams.get('status');
-    const plan_type = urlParams.get('plan');
-    
-    console.log("Payment parameters:", { subscription_id, status, plan_type });
-    
-    if (subscription_id && 
-        status === 'active' && 
-        !processedSubscriptions.includes(subscription_id)) {
-        
-        let creditAmount, planName;
-        
-        if (plan_type && PRICE_PLANS[plan_type]) {
-            creditAmount = PRICE_PLANS[plan_type].credits;
-            planName = plan_type.charAt(0).toUpperCase() + plan_type.slice(1);
-        } else {
-            // Default to standard plan
-            creditAmount = PRICE_PLANS.standard.credits;
-            planName = "Standard";
-        }
-        
-        console.log(`Adding ${creditAmount} credits for ${planName} plan`);
-        
-        credits += creditAmount;
-        updateCreditBalance();
-        
-        processedSubscriptions.push(subscription_id);
-        localStorage.setItem('processedSubscriptions', JSON.stringify(processedSubscriptions));
-        
-        alert(`Purchase successful! ${creditAmount.toLocaleString()} credits from ${planName} Plan have been added to your account.`);
-        
-        stopContinuousPaymentCheck();
-    }
-}
-
-
-function logSuccessfulPayment(subscription_id, planName, creditAmount) {
-    console.log(`Payment processed: ${subscription_id}, ${planName} Plan, ${creditAmount} credits`);
-}
 
 
 
@@ -428,8 +309,7 @@ if (freeTrialInterval === null) {
 document.getElementById('buyCredits').addEventListener('click', () => {
     document.getElementById('pricingModal').style.display = 'flex';
 
-    startContinuousPaymentCheck();
-
+    
     // Load pricing content dynamically
     fetch('pricing.html')
         .then(response => response.text())
@@ -559,6 +439,32 @@ document.getElementById('buyCredits').addEventListener('click', () => {
 
     });
 
+ // Listen for messages from the iframe
+window.addEventListener('message', function(event) {
+    // Validate the origin
+    if (event.origin !== 'https://imaginea.store') {
+        return; // Ignore messages from unexpected origins
+    }
+
+    // Check the message type
+    if (event.data.type === 'getUrl') {
+        // Send the current URL back to the iframe
+        event.source.postMessage({ type: 'urlResponse', url: window.location.href }, event.origin);
+    }
+});
+   
+    window.addEventListener('message', function(event) {
+    // Validate the origin (ensure the message is from the iframe)
+    if (event.origin !== 'https://imaginea.store') {
+        return; // Ignore messages from unexpected origins
+    }
+
+    // Check the message type
+    if (event.data.type === 'openLink') {
+        // Open the link in a new tab
+        window.open(event.data.url, '_blank');
+    }
+});
 
     window.addEventListener('load', () => {
     const monitoringStartTime = localStorage.getItem('paymentMonitoringStarted');
@@ -575,7 +481,6 @@ document.getElementById('buyCredits').addEventListener('click', () => {
             paymentCheckInterval = setInterval(() => {
                 console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
             
-                checkPaymentStatus();
                 
                 // Recalculate elapsed time since we're continuing from a previous session
                 const currentElapsedTime = new Date().getTime() - startTime;

@@ -439,31 +439,34 @@ document.getElementById('buyCredits').addEventListener('click', () => {
 
     });
 
- // Listen for messages from the iframe
+    // This part stays the same - just make sure it's passing the URL correctly
 window.addEventListener('message', function(event) {
-    // Validate the origin
-    if (event.origin !== 'https://imaginea.store') {
-        return; // Ignore messages from unexpected origins
-    }
-
-    // Check the message type
-    if (event.data.type === 'getUrl') {
-        // Send the current URL back to the iframe
-        event.source.postMessage({ type: 'urlResponse', url: window.location.href }, event.origin);
-    }
+  if (event.origin !== 'https://imaginea.store') {
+    return;
+  }
+  
+  if (event.data.type === 'getUrl') {
+    event.source.postMessage({
+      type: 'urlResponse',
+      url: window.location.href
+    }, event.origin);
+  }
 });
-   
-    window.addEventListener('message', function(event) {
-    // Validate the origin (ensure the message is from the iframe)
-    if (event.origin !== 'https://imaginea.store') {
-        return; // Ignore messages from unexpected origins
-    }
 
-    // Check the message type
-    if (event.data.type === 'openLink') {
-        // Open the link in a new tab
-        window.open(event.data.url, '_blank');
+// If you must navigate the parent window from the iframe
+window.addEventListener('message', function(event) {
+  if (event.origin !== 'https://imaginea.store') {
+    return;
+  }
+  
+  if (event.data.type === 'forceNavigate') {
+    try {
+      // This is a last resort due to security concerns
+      window.location.href = event.data.url;
+    } catch (e) {
+      console.error('Navigation error:', e);
     }
+  }
 });
 
     window.addEventListener('load', () => {

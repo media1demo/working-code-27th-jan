@@ -212,7 +212,7 @@ const PRICE_PLANS = {
 let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
 let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
-const PAYMENT_CHECK_FREQUENCY = 60 * 100; // 0.1 minute in milliseconds
+const PAYMENT_CHECK_FREQUENCY = 60 * 500; // 0.1 minute in milliseconds
 
 function checkPaymentStatus() {
     // Use window.parent.location.href instead of window.location
@@ -267,7 +267,10 @@ window.onload = () => {
                 paymentCheckInterval = null;
                 console.log("Completed payment status checks");
             } else {
-                checkPaymentStatus();
+                setTimeout(() => {
+                    checkPaymentStatus();
+                }, 1000);
+             
             }
         }, PAYMENT_CHECK_FREQUENCY);
     }

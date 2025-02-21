@@ -214,16 +214,46 @@ let paymentCheckInterval = null;
 const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 const PAYMENT_CHECK_FREQUENCY = 60 * 500; // 0.1 minute in milliseconds
 
+function getUrlParams(url) {
+    let params = {};
+    const queryString = url.split('?')[1];
+    if (queryString) {
+        const pairs = queryString.split('&');
+        for (let pair of pairs) {
+            const [key, value] = pair.split('=');
+            params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+        }
+    }
+    return params;
+}
+
+
+
 function checkPaymentStatus() {
     try {
         const newurl = window.parent.location.href;
         console.log(newurl);
-        alert(newurl)
+        
+        // Parse URL parameters
+        const params = getUrlParams(newurl);
+        const status = params.status;
+        
+        // Check if status is active or succeeded
+        if (status === 'active' || status === 'succeeded') {
+            console.log(`Payment successful with status: ${status}`);
+            // We'll store this flag to use when buttons are clicked
+            window.paymentVerified = true;
+        } else {
+            window.paymentVerified = false;
+        }
+        
+        alert(newurl);
     } catch (error) {
         console.error("Cannot access parent frame URL due to same-origin policy:", error);
         // alert("Cannot access parent URL due to security restrictions");
     }
 }
+
 
 window.onload = () => {
     console.log("Page loaded, checking payment status...");
@@ -341,41 +371,80 @@ document.getElementById('buyCredits').addEventListener('click', () => {
             
             // Add event listeners to the buttons
             if (document.querySelector('.basic button')) {
+           
                 document.querySelector('.basic button').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Open payment in new window
-                    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_EitEKFr2ROBL52XAMfGYt?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
-                    
-                    // Check payment window location after a delay
-                    setTimeout(() => {
-                        try {
-                            alert(paymentWindow.location.href);
-                        } catch(e) {
-                            // This might fail due to same-origin policy if redirected to a different domain
-                            console.log('Cannot access window location due to same-origin policy');
-                        }
-                    }, 3000);
-                });
+    e.preventDefault();
+    
+    // Check if payment is verified before opening payment window
+    if (window.paymentVerified) {
+        // Add 10,000 credits if payment is verified
+        credits += 10000;
+        updateCreditBalance();
+        alert("Added 10,000 credits to your account!");
+    }
+    
+    // Open payment in new window
+    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_EitEKFr2ROBL52XAMfGYt?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+    
+    // Check payment window location after a delay
+    setTimeout(() => {
+        try {
+            const redirectedUrl = paymentWindow.location.href;
+            alert(redirectedUrl);
+            
+            // Check status in the redirected URL
+            const params = getUrlParams(redirectedUrl);
+            if (params.status === 'active' || params.status === 'succeeded') {
+                credits += 10000;
+                updateCreditBalance();
+                alert("Added 10,000 credits to your account!");
+            }
+        } catch(e) {
+            // This might fail due to same-origin policy if redirected to a different domain
+            console.log('Cannot access window location due to same-origin policy');
+        }
+    }, 3000);
+});
+
+           
             }
             
             if (document.querySelector('.standard button')) {
+           
                 document.querySelector('.standard button').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Open payment in new window
-                    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_2xGGr4Pc9WSDZrTXx21Wn?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
-                    
-                    // Check payment window location after a delay
-                    setTimeout(() => {
-                        try {
-                            alert(paymentWindow.location.href);
-                        } catch(e) {
-                            // This might fail due to same-origin policy if redirected to a different domain
-                            console.log('Cannot access window location due to same-origin policy');
-                        }
-                    }, 3000);
-                });
+    e.preventDefault();
+    
+    // Check if payment is verified before opening payment window
+    if (window.paymentVerified) {
+        // Add 1,000,000 credits if payment is verified
+        credits += 1000000;
+        updateCreditBalance();
+        alert("Added 1,000,000 credits to your account!");
+    }
+    
+    // Open payment in new window
+    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_2xGGr4Pc9WSDZrTXx21Wn?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+    
+    // Check payment window location after a delay
+    setTimeout(() => {
+        try {
+            const redirectedUrl = paymentWindow.location.href;
+            alert(redirectedUrl);
+            
+            // Check status in the redirected URL
+            const params = getUrlParams(redirectedUrl);
+            if (params.status === 'active' || params.status === 'succeeded') {
+                credits += 1000000;
+                updateCreditBalance();
+                alert("Added 1,000,000 credits to your account!");
+            }
+        } catch(e) {
+            // This might fail due to same-origin policy if redirected to a different domain
+            console.log('Cannot access window location due to same-origin policy');
+        }
+    }, 3000);
+});
+
             }
         });
 });

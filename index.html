@@ -218,7 +218,7 @@ function checkPaymentStatus() {
     try {
         const newurl = window.parent.location.href;
         console.log(newurl);
-        alert(newurl);
+        
     } catch (error) {
         console.error("Cannot access parent frame URL due to same-origin policy:", error);
         alert("Cannot access parent URL due to security restrictions");

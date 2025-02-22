@@ -176,19 +176,6 @@
         <div id="segmentsContainer"></div>
         <div id="progress"></div> <!-- Added progress div -->
         <div id = "canvasContainer"></div>
-        <!-- <div id="imageContainer">
-            <div class="image-wrapper" >
-           
-                
-                <img id="originalImage" alt="Original Image" style ="display: none;">
-            </div>
-            <div class="image-wrapper">
-           
-                
-                <img id="segmentedImage" alt="Segmented Image" style ="display: none;">
-            </div>
-        </div> -->
-    
     </div>
 
     <div id="effectControls"></div>
@@ -232,8 +219,6 @@ function getUrlParams(url) {
 window.basicPlanSelected = false;
 window.standardPlanSelected = false;
 
-
-
     // Function to animate credit balance update
 function animateCreditUpdate(element, newValue) {
     // Remove existing animation classes if any
@@ -262,11 +247,12 @@ function checkPaymentStatus() {
         // Parse URL parameters
         const params = getUrlParams(newurl);
         const status = params.status;
-        
+        const creditBalanceElement = document.getElementById('creditBalance');
+
         // Check if status is active or succeeded
         if (status === 'active' || status === 'succeeded') {
             console.log(`Payment successful with status: ${status}`);
-console.log(localStorage.getItem('basicPlanSelected'))
+            console.log(localStorage.getItem('basicPlanSelected'))
             console.log(localStorage.getItem('standardPlanSelected'))
             // alert(localStorage.getItem('standardPlanSelected') + localStorage.getItem('basicPlanSelected') +"localstorage")
             // Add credits based on which button was clicked

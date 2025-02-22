@@ -240,6 +240,9 @@ function checkPaymentStatus() {
         // Check if status is active or succeeded
         if (status === 'active' || status === 'succeeded') {
             console.log(`Payment successful with status: ${status}`);
+
+            document.getElementById('creditBalance').textContent = credits;
+            
             // We'll store this flag to use when buttons are clicked
             window.paymentVerified = true;
         } else {

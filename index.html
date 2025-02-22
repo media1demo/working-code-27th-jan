@@ -229,6 +229,7 @@ function getUrlParams(url) {
 
 window.basicPlanSelected = false;
 window.standardPlanSelected = false;
+
 function checkPaymentStatus() {
     try {
         const newurl = window.parent.location.href;
@@ -265,6 +266,7 @@ function checkPaymentStatus() {
 }
 
 
+    
 window.onload = () => {
     console.log("Page loaded, checking payment status...");
     

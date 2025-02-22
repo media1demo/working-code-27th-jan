@@ -227,8 +227,7 @@ function getUrlParams(url) {
     return params;
 }
 
-
-function checkPaymentStatus() {
+    function checkPaymentStatus() {
     try {
         const newurl = window.parent.location.href;
         console.log(newurl);
@@ -236,25 +235,32 @@ function checkPaymentStatus() {
         // Parse URL parameters
         const params = getUrlParams(newurl);
         const status = params.status;
+        const plan = params.plan; // Add a plan parameter to distinguish between basic and standard
         
         // Check if status is active or succeeded
         if (status === 'active' || status === 'succeeded') {
             console.log(`Payment successful with status: ${status}`);
-
-            document.getElementById('creditBalance').textContent = credits;
             
-            // We'll store this flag to use when buttons are clicked
-            window.paymentVerified = true;
-        } else {
-            window.paymentVerified = false;
+            // Add credits based on the plan
+            if (plan === 'basic') {
+                credits += 10000;
+                alert("Added 10,000 credits to your account!");
+            } else if (plan === 'standard') {
+                credits += 1000000;
+                alert("Added 1,000,000 credits to your account!");
+            }
+            
+            // Update credit balance display
+            updateCreditBalance();
+            document.getElementById('creditBalance').textContent = credits;
         }
         
         alert(newurl);
     } catch (error) {
         console.error("Cannot access parent frame URL due to same-origin policy:", error);
-        // alert("Cannot access parent URL due to security restrictions");
     }
 }
+
 
 
 window.onload = () => {

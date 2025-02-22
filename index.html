@@ -183,7 +183,26 @@
 
 <script>
 
-
+function animateNumberCount(element, start, end, duration = 1000) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentNumber = Math.floor(progress * (end - start) + start);
+        element.textContent = `Credits: ${currentNumber.toLocaleString()}`;
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        } else {
+            element.textContent = `Credits: ${end.toLocaleString()}`;
+            // Remove animation classes after completion
+            setTimeout(() => {
+                element.classList.remove('credit-animate');
+            }, 700);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
 
 let credits = parseInt(localStorage.getItem('credits')) || 10000;
 let freeTrialInterval = null;
@@ -259,11 +278,13 @@ function checkPaymentStatus() {
             if (localStorage.getItem('basicPlanSelected') === 'true') {
                 credits += 10000;
                 // alert("Added 10,000 credits to your account!");
-                animateCreditUpdate(creditBalanceElement, credits);
+                animateNumberCount(creditBalanceElement, currentCredits, newCredits);
+                // animateCreditUpdate(creditBalanceElement, credits);
                 localStorage.removeItem('basicPlanSelected'); // Reset the flag
             } else if (localStorage.getItem('standardPlanSelected') === 'true') {
                 credits += 1000000;
-                animateCreditUpdate(creditBalanceElement, credits);
+                // animateCreditUpdate(creditBalanceElement, credits);
+                animateNumberCount(creditBalanceElement, currentCredits, newCredits);
 
                 // alert("Added 1,000,000 credits to your account!");
                 localStorage.removeItem('standardPlanSelected'); // Reset the flag

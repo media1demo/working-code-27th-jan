@@ -245,8 +245,8 @@ function checkPaymentStatus() {
             console.log(`Payment successful with status: ${status}`);
             console.log(window.basicPlanSelected)
             console.log(window.standardPlanSelected)
-            alert("window.basicPlanSelected",window.basicPlanSelected)
-            alert("window.standardPlanSelected",window.standardPlanSelected)
+            alert("window.basicPlanSelected" +window.basicPlanSelected)
+            alert("window.standardPlanSelected" + window.standardPlanSelected)
             // Add credits based on which button was clicked
             if (window.basicPlanSelected) {
                 credits += 10000;

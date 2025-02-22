@@ -232,6 +232,28 @@ function getUrlParams(url) {
 window.basicPlanSelected = false;
 window.standardPlanSelected = false;
 
+
+
+    // Function to animate credit balance update
+function animateCreditUpdate(element, newValue) {
+    // Remove existing animation classes if any
+    element.classList.remove('credit-update-animation', 'credit-glow');
+    
+    // Trigger reflow to restart animation
+    void element.offsetWidth;
+    
+    // Add animation classes
+    element.classList.add('credit-update-animation', 'credit-glow');
+    
+    // Update the text content
+    element.textContent = newValue;
+    
+    // Remove animation classes after animation completes
+    setTimeout(() => {
+        element.classList.remove('credit-update-animation', 'credit-glow');
+    }, 500); // Match this with animation duration
+}
+    
 function checkPaymentStatus() {
     try {
         const newurl = window.parent.location.href;
@@ -250,10 +272,13 @@ console.log(localStorage.getItem('basicPlanSelected'))
             // Add credits based on which button was clicked
             if (localStorage.getItem('basicPlanSelected') === 'true') {
                 credits += 10000;
-                alert("Added 10,000 credits to your account!");
+                // alert("Added 10,000 credits to your account!");
+                animateCreditUpdate(creditBalanceElement, credits);
                 localStorage.removeItem('basicPlanSelected'); // Reset the flag
             } else if (localStorage.getItem('standardPlanSelected') === 'true') {
                 credits += 1000000;
+                animateCreditUpdate(creditBalanceElement, credits);
+
                 // alert("Added 1,000,000 credits to your account!");
                 localStorage.removeItem('standardPlanSelected'); // Reset the flag
             }

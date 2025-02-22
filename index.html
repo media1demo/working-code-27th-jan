@@ -243,7 +243,8 @@ function checkPaymentStatus() {
         // Check if status is active or succeeded
         if (status === 'active' || status === 'succeeded') {
             console.log(`Payment successful with status: ${status}`);
-            
+            console.log(window.basicPlanSelected)
+            console.log(window.standardPlanSelected)
             // Add credits based on which button was clicked
             if (window.basicPlanSelected) {
                 credits += 10000;

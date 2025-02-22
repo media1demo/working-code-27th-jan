@@ -254,7 +254,7 @@ console.log(localStorage.getItem('basicPlanSelected'))
                 localStorage.removeItem('basicPlanSelected'); // Reset the flag
             } else if (localStorage.getItem('standardPlanSelected') === 'true') {
                 credits += 1000000;
-                alert("Added 1,000,000 credits to your account!");
+                // alert("Added 1,000,000 credits to your account!");
                 localStorage.removeItem('standardPlanSelected'); // Reset the flag
             }
             
@@ -263,7 +263,7 @@ console.log(localStorage.getItem('basicPlanSelected'))
             document.getElementById('creditBalance').textContent = credits;
         }
         
-        alert(newurl);
+        // alert(newurl);
     } catch (error) {
         console.error("Cannot access parent frame URL due to same-origin policy:", error);
     }

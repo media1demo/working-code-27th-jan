@@ -246,7 +246,6 @@ const effects =
     "pp5",
     "randompic",
     "removebg",
-    
     "rotatebottomleftccw",
     "rotatebottomleftcw",
     "rotatebottomleftvariable",
@@ -732,56 +731,162 @@ async function fastProcessImage(img, existingGeneratedImages = []) {
 sourceImages = [];
 
 
-function addDownloadAllButton() {
-    // Check if there's already a download all button to avoid duplicates
-    if (document.getElementById('download-all-btn')) return;
-    
-    // Create the button container
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'download-all-container';
-    buttonContainer.style.cssText = 'text-align: center; margin: 20px 0; width: 100%;';
-    
-    // Create the button
-    const downloadAllBtn = document.createElement('button');
-    downloadAllBtn.id = 'download-all-btn';
-    downloadAllBtn.className = 'download-all-btn';
-    downloadAllBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" style="margin-right: 8px;">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Download All Animations
+function enterFullscreen(wrapper, img) {
+    // Create a fullscreen container
+    const fullscreenContainer = document.createElement('div');
+    fullscreenContainer.className = 'fullscreen-grid-container';
+    fullscreenContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        z-index: 9999;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        overflow-y: auto;
     `;
-    downloadAllBtn.style.cssText = `
-        background-color: #4a5568;
-        color: white;
+
+    // Add close button
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    `;
+    closeButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.2);
         border: none;
-        border-radius: 6px;
-        padding: 10px 16px;
-        font-size: 16px;
-        font-weight: 500;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto;
-        transition: background-color 0.2s;
+        color: white;
+        z-index: 10000;
+        transition: background-color 0.3s;
     `;
-    
-    // Hover effect
-    downloadAllBtn.onmouseover = () => { downloadAllBtn.style.backgroundColor = '#2d3748'; };
-    downloadAllBtn.onmouseout = () => { downloadAllBtn.style.backgroundColor = '#4a5568'; };
-    
-    // Add click handler
-    downloadAllBtn.addEventListener('click', handleDownloadAllAnimations);
-    
-    // Add the button to the container
-    buttonContainer.appendChild(downloadAllBtn);
-    
-    // Insert at the top of the results container
-    resultsContainer.insertBefore(buttonContainer, resultsContainer.firstChild);
+
+    // Store animation intervals to clear them later
+    const animationIntervals = [];
+
+    // Clone all animations
+    effects.forEach(effect => {
+        if (animationStatus[effect] && processedImages[effect]?.length > 0) {
+            const animationContainer = document.createElement('div');
+            animationContainer.className = 'fullscreen-animation-container';
+            animationContainer.style.cssText = `
+                position: relative;
+                width: 100%;
+                padding-bottom: 100%; /* Maintain aspect ratio */
+                background: #111;
+                border-radius: 8px;
+                overflow: hidden;
+            `;
+
+            // Add effect label
+            const label = document.createElement('div');
+            label.textContent = effect;
+            label.style.cssText = `
+                color: white;
+                padding: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                background: rgba(0, 0, 0, 0.5);
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+            `;
+
+            // Create image container for proper positioning
+            const imageContainer = document.createElement('div');
+            imageContainer.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            // Create image for animation
+            const animImg = new Image();
+            animImg.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            `;
+
+            // Start with first frame
+            if (processedImages[effect].length > 0) {
+                animImg.src = processedImages[effect][0].dataUrl;
+            }
+
+            // Add animation
+            let currentFrame = 0;
+            const intervalId = setInterval(() => {
+                if (processedImages[effect] && processedImages[effect].length > 0) {
+                    animImg.src = processedImages[effect][currentFrame].dataUrl;
+                    currentFrame = (currentFrame + 1) % processedImages[effect].length;
+                }
+            }, 200);
+
+            animationIntervals.push(intervalId);
+
+            imageContainer.appendChild(animImg);
+            animationContainer.appendChild(imageContainer);
+            animationContainer.appendChild(label);
+            fullscreenContainer.appendChild(animationContainer);
+        }
+    });
+
+    // Cleanup function to clear all intervals
+    function cleanup() {
+        if (!document.fullscreenElement) {
+            animationIntervals.forEach(interval => clearInterval(interval));
+            fullscreenContainer.remove();
+            document.removeEventListener('fullscreenchange', cleanup);
+        }
+    }
+
+    // Add close functionality
+    closeButton.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    });
+
+    // Listen for fullscreen change
+    document.addEventListener('fullscreenchange', cleanup);
+
+    // Add container and button to body
+    fullscreenContainer.appendChild(closeButton);
+    document.body.appendChild(fullscreenContainer);
+
+    // Enter fullscreen mode
+    if (fullscreenContainer.requestFullscreen) {
+        fullscreenContainer.requestFullscreen();
+    } else if (fullscreenContainer.webkitRequestFullscreen) {
+        fullscreenContainer.webkitRequestFullscreen();
+    } else if (fullscreenContainer.msRequestFullscreen) {
+        fullscreenContainer.msRequestFullscreen();
+    }
 }
+
 
 function createWatermarkedFrame(image, logo) {
     const canvas = document.createElement('canvas');
@@ -794,6 +899,7 @@ function createWatermarkedFrame(image, logo) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, 0, 0);
     
+
     const logoSize = {
       width: image.width * 0.1,
       height: image.height * 0.05
@@ -809,8 +915,150 @@ function createWatermarkedFrame(image, logo) {
     return canvas;
   }
        
+
+  function addDownloadAllButton() {
+    // Check if there's already a download all button to avoid duplicates
+    if (document.getElementById('download-all-btn')) return;
+
+    // Count available animations
+    const availableEffects = effects.filter(effect => 
+        animationStatus[effect] && processedImages[effect]?.length > 0
+    );
+    const animationCount = availableEffects.length;
+
+    // Create the button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.style.cssText = `
+        text-align: center;
+        margin: 20px 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Add spacing between buttons */
+    `;
+
+    // Create the "Download All Animations" button
+    const downloadAllBtn = document.createElement('button');
+    downloadAllBtn.id = 'download-all-btn';
+    downloadAllBtn.className = 'download-all-btn';
+    downloadAllBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download" style="margin-right: 8px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download All Animations (${animationCount})
+    `;
+    downloadAllBtn.style.cssText = `
+        background-color: #4a5568;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+        min-width: 250px;
+    `;
+
+    // Disable the button if no animations are available
+    if (animationCount === 0) {
+        downloadAllBtn.disabled = true;
+        downloadAllBtn.style.opacity = '0.5';
+        downloadAllBtn.style.cursor = 'not-allowed';
+    } else {
+        // Hover effect
+        downloadAllBtn.onmouseover = () => { downloadAllBtn.style.backgroundColor = '#2d3748'; };
+        downloadAllBtn.onmouseout = () => { downloadAllBtn.style.backgroundColor = '#4a5568'; };
+    }
+
+    // Create the "Fullscreen" button
+    const fullscreenBtn = document.createElement('button');
+    fullscreenBtn.id = 'fullscreen-btn';
+    fullscreenBtn.className = 'fullscreen-btn';
+    fullscreenBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize" style="margin-right: 8px;">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+        Fullscreen
+    `;
+    fullscreenBtn.style.cssText = `
+        background-color: #4a5568;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+        min-width: 150px;
+    `;
+
+    // Hover effect for fullscreen button
+    fullscreenBtn.onmouseover = () => { fullscreenBtn.style.backgroundColor = '#2d3748'; };
+    fullscreenBtn.onmouseout = () => { fullscreenBtn.style.backgroundColor = '#4a5568'; };
+
+    // Add click handler for fullscreen button
+    fullscreenBtn.addEventListener('click', () => {
+        enterFullscreen();
+    });
+
+    // Create progress element (hidden initially)
+    const progressContainer = document.createElement('div');
+    progressContainer.id = 'download-progress-container';
+    progressContainer.style.cssText = `
+        width: 100%;
+        max-width: 400px;
+        margin: 10px auto 0;
+        display: none;
+    `;
+
+    const progressBar = document.createElement('div');
+    progressBar.id = 'download-progress-bar';
+    progressBar.style.cssText = `
+        height: 6px;
+        width: 0%;
+        background-color: #4299e1;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    `;
+
+    const progressText = document.createElement('div');
+    progressText.id = 'download-progress-text';
+    progressText.style.cssText = `
+        font-size: 12px;
+        color: #4a5568;
+        margin-top: 4px;
+        text-align: center;
+    `;
+
+    progressContainer.appendChild(progressBar);
+    progressContainer.appendChild(progressText);
+
+    // Add click handler for download all button
+    downloadAllBtn.addEventListener('click', () => handleDownloadAllAnimations(progressBar, progressText, progressContainer));
+
+    // Add buttons to the container
+    buttonContainer.appendChild(downloadAllBtn);
+    buttonContainer.appendChild(fullscreenBtn);
+    buttonContainer.appendChild(progressContainer);
+
+    // Insert at the top of the results container
+    resultsContainer.insertBefore(buttonContainer, resultsContainer.firstChild);
+}
+
+
 // Function to handle downloading all animations
-async function handleDownloadAllAnimations() {
+async function handleDownloadAllAnimations(progressBar, progressText, progressContainer) {
     const btn = document.getElementById('download-all-btn');
     const originalContent = btn.innerHTML;
     
@@ -819,23 +1067,14 @@ async function handleDownloadAllAnimations() {
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
             <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
         </svg>
-        Preparing downloads...
+        Preparing download...
     `;
     btn.disabled = true;
     
+    // Show progress container
+    progressContainer.style.display = 'block';
+    
     try {
-        // Load the logo for watermarking once
-        const logo = await new Promise((resolve, reject) => {
-            const logoImg = new Image();
-            logoImg.crossOrigin = "anonymous";
-            logoImg.onload = () => resolve(logoImg);
-            logoImg.onerror = reject;
-            logoImg.src = 'logo1.jpg';
-        });
-        
-        // Create a zip file
-        const zip = new JSZip();
-        
         // Get all effects with completed animations
         const availableEffects = effects.filter(effect => 
             animationStatus[effect] && processedImages[effect]?.length > 0
@@ -845,65 +1084,189 @@ async function handleDownloadAllAnimations() {
             throw new Error('No animations available to download');
         }
         
-        // Update button text with count
-        btn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-            </svg>
-            Processing 0/${availableEffects.length} animations...
-        `;
+        // Start timing
+        const startTime = Date.now();
         
-        // Process each effect
-        for (let i = 0; i < availableEffects.length; i++) {
-            const effect = availableEffects[i];
+        // Calculate total number of frames to process
+        const totalFrames = availableEffects.reduce((total, effect) => {
+            return total + processedImages[effect].length;
+        }, 0);
+        
+        // Load the logo once for all animations
+        progressText.textContent = 'Loading resources...';
+        const logo = await new Promise((resolve, reject) => {
+            const logoImg = new Image();
+            logoImg.crossOrigin = "anonymous";
+            logoImg.onload = () => resolve(logoImg);
+            logoImg.onerror = reject;
+            logoImg.src = 'logo1.jpg';
+        });
+        
+        // Track processed frames
+        let processedFrames = 0;
+        let completedGifs = 0;
+        
+        // Update both progress text and progress bar
+        const updateProgress = (additionalFrames, completedGif = false) => {
+            processedFrames += additionalFrames;
+            if (completedGif) completedGifs++;
             
-            // Update progress
-            btn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                </svg>
-                Processing ${i+1}/${availableEffects.length}: ${effect}...
-            `;
+            const percentComplete = Math.min(95, (processedFrames / totalFrames) * 100);
+            progressBar.style.width = `${percentComplete}%`;
             
-            // Create GIF for this effect
-            const gifBlob = await new Promise((resolve, reject) => {
-                const gif = new GIF({
-                    workers: 2,
-                    quality: 10,
-                    width: processedImages[effect][0]?.width || 400,
-                    height: processedImages[effect][0]?.height || 300,
-                    background: '#FFFFFF'
+            // Calculate estimated time remaining
+            const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+            const framesPerSecond = processedFrames / elapsedTime;
+            const remainingFrames = totalFrames - processedFrames;
+            
+            let estimatedSecondsRemaining = remainingFrames / framesPerSecond;
+            if (!isFinite(estimatedSecondsRemaining) || isNaN(estimatedSecondsRemaining)) {
+                estimatedSecondsRemaining = 0;
+            }
+            
+            const minutes = Math.floor(estimatedSecondsRemaining / 60);
+            const seconds = Math.floor(estimatedSecondsRemaining % 60);
+            
+            const timeText = minutes > 0 
+                ? `${minutes}m ${seconds}s remaining` 
+                : `${seconds}s remaining`;
+            
+            progressText.textContent = `Processing ${completedGifs}/${availableEffects.length} animations (${timeText})`;
+        };
+        
+        // Create a zip file
+        const zip = new JSZip();
+        btn.innerHTML = `Processing animations...`;
+        
+        // Create a worker pool for parallel processing
+        const maxConcurrentWorkers = Math.min(4, availableEffects.length);
+        const queue = [...availableEffects];
+        const results = [];
+        const activePromises = [];
+        
+        // Process queue with limited concurrency
+        async function processQueue() {
+            while (queue.length > 0) {
+                const effect = queue.shift();
+                
+                // Process this effect
+                const promise = new Promise(async (resolve, reject) => {
+                    try {
+                        const frames = processedImages[effect].length;
+                        const gif = new GIF({
+                            workers: 2,
+                            quality: 10,
+                            width: processedImages[effect][0]?.width || 400,
+                            height: processedImages[effect][0]?.height || 300,
+                            background: '#FFFFFF'
+                        });
+                        
+                        // Track progress within this GIF
+                        let framesAdded = 0;
+                        
+                        // Load all images for this effect
+                        const loadedImages = await Promise.all(
+                            processedImages[effect].map(imageData => {
+                                return new Promise((imgResolve) => {
+                                    const tempImg = new Image();
+                                    tempImg.onload = () => {
+                                        framesAdded++;
+                                        if (framesAdded % 5 === 0 || framesAdded === processedImages[effect].length) {
+                                            updateProgress(5);
+                                        }
+                                        imgResolve(tempImg);
+                                    };
+                                    tempImg.src = imageData.dataUrl;
+                                });
+                            })
+                        );
+                        
+                        // Add frames to GIF
+                        loadedImages.forEach(loadedImg => {
+                            const canvas = createWatermarkedFrame(loadedImg, logo);
+                            gif.addFrame(canvas, { delay: 200 });
+                        });
+                        
+                        // Render the GIF
+                        gif.on('finished', blob => {
+                            updateProgress(0, true);
+                            resolve({
+                                effect: effect,
+                                blob: blob
+                            });
+                        });
+                        
+                        gif.on('error', error => {
+                            console.error(`Error creating GIF for ${effect}:`, error);
+                            reject(error);
+                        });
+                        
+                        gif.render();
+                    } catch (error) {
+                        reject(error);
+                    }
                 });
                 
-                // Load all images for this effect
-                Promise.all(processedImages[effect].map(imageData => {
-                    return new Promise((resolve) => {
-                        const tempImg = new Image();
-                        tempImg.onload = () => resolve(tempImg);
-                        tempImg.src = imageData.dataUrl;
-                    });
-                }))
-                .then(loadedImages => {
-                    // Add each frame with logo
-                    loadedImages.forEach(loadedImg => {
-                        const canvas = createWatermarkedFrame(loadedImg, logo);
-                        gif.addFrame(canvas, { delay: 200 });
-                    });
-                    
-                    // Render the GIF
-                    gif.on('finished', resolve);
-                    gif.on('error', reject);
-                    gif.render();
-                })
-                .catch(reject);
-            });
+                activePromises.push(promise);
+                
+                // If we're at max concurrency, wait for one to finish
+                if (activePromises.length >= maxConcurrentWorkers) {
+                    try {
+                        const result = await Promise.race(activePromises);
+                        const index = activePromises.findIndex(p => p.then(() => result));
+                        if (index !== -1) {
+                            activePromises.splice(index, 1);
+                        }
+                        results.push(result);
+                    } catch (error) {
+                        console.error('Error in worker:', error);
+                    }
+                }
+            }
             
-            // Add the GIF to the zip file
-            zip.file(`${effect}-animation.gif`, gifBlob);
+            // Wait for remaining promises to complete
+            try {
+                const finalResults = await Promise.allSettled(activePromises);
+                finalResults.forEach(result => {
+                    if (result.status === 'fulfilled') {
+                        results.push(result.value);
+                    }
+                });
+            } catch (error) {
+                console.error('Error in final processing:', error);
+            }
+            
+            return results;
         }
         
+        // Process the queue and get results
+        const successfulResults = await processQueue();
+        
+        if (successfulResults.length === 0) {
+            throw new Error('Failed to generate any animations');
+        }
+        
+        // Add each successful GIF to the ZIP file
+        successfulResults.forEach(result => {
+            zip.file(`${result.effect}-animation.gif`, result.blob);
+        });
+        
+        // Update status
+        btn.innerHTML = `Creating ZIP file...`;
+        progressText.textContent = 'Finalizing ZIP file...';
+        progressBar.style.width = '98%';
+        
         // Generate and download the zip file
-        const zipBlob = await zip.generateAsync({type: 'blob'});
+        const zipBlob = await zip.generateAsync({type: 'blob', 
+            compression: "DEFLATE",
+            compressionOptions: {
+                level: 5
+            }
+        });
+        
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Download complete!';
+        
         const zipUrl = URL.createObjectURL(zipBlob);
         const a = document.createElement('a');
         a.href = zipUrl;
@@ -916,9 +1279,21 @@ async function handleDownloadAllAnimations() {
             URL.revokeObjectURL(zipUrl);
         }, 100);
         
-        // Reset button
-        btn.innerHTML = originalContent;
-        btn.disabled = false;
+        // Show success message
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check">
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Downloaded ${successfulResults.length} animations!
+        `;
+        
+        // Reset after a moment
+        setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+        }, 3000);
         
     } catch (error) {
         console.error('Error creating animations package:', error);
@@ -933,16 +1308,19 @@ async function handleDownloadAllAnimations() {
             Error: ${error.message || 'Failed to download'}
         `;
         
+        progressText.textContent = 'Download failed. Please try again.';
+        progressBar.style.backgroundColor = '#e53e3e';
+        
         // Reset after a delay
         setTimeout(() => {
             btn.innerHTML = originalContent;
             btn.disabled = false;
+            progressContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.style.backgroundColor = '#4299e1';
         }, 3000);
     }
 }
-
-
-
 
 function displayFinishedAnimations() {
     resultsContainer.innerHTML = ''; // Clear existing content
@@ -953,28 +1331,41 @@ function displayFinishedAnimations() {
             // Create a container for the effect
             const container = document.createElement('div');
             container.className = 'effect-container';
-
+            
             // Add a label for the effect
             const label = document.createElement('div');
             label.className = 'effect-label';
             label.textContent = effect; // Use the effect name as the label
             container.appendChild(label);
-
+            
             // Create a wrapper for the animation
             const wrapper = document.createElement('div');
             wrapper.className = 'canvas-wrapper';
-
+            wrapper.style.position = 'relative'; // Add relative positioning
+            
             // Create the image element for the animation
             const img = new Image();
             img.id = `${effect}-image`;
             img.className = 'processed-image';
-
+            
+            // Create icon container
+            const iconContainer = document.createElement('div');
+            iconContainer.className = 'icon-container';
+            iconContainer.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                display: flex;
+                gap: 10px;
+                z-index: 10;
+            `;
+            
             // Add the image to the wrapper
             wrapper.appendChild(img);
-
+            
             // Add a download icon
             const downloadIcon = document.createElement('div');
-            downloadIcon.className = 'download-icon';
+            downloadIcon.className = 'action-icon download-icon';
             downloadIcon.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -983,9 +1374,8 @@ function displayFinishedAnimations() {
                 </svg>
             `;
 
-
             const shareIcon = document.createElement('div');
-            shareIcon.className = 'share-icon';
+            shareIcon.className = 'action-icon share-icon';
             shareIcon.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2">
                     <circle cx="18" cy="5" r="3"/>
@@ -996,6 +1386,35 @@ function displayFinishedAnimations() {
                 </svg>
             `;
 
+            const fullscreenIcon = document.createElement('div');
+            fullscreenIcon.className = 'action-icon fullscreen-icon';
+            fullscreenIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            `;
+
+            // Add consistent styling for all icons
+            const iconStyle = `
+                background-color: rgba(0, 0, 0, 0.5);
+                border-radius: 50%;
+                padding: 8px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            [downloadIcon, shareIcon, fullscreenIcon].forEach(icon => {
+                icon.style.cssText = iconStyle;
+                icon.addEventListener('mouseover', () => {
+                    icon.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                });
+                icon.addEventListener('mouseout', () => {
+                    icon.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                });
+            });
 
             // Add click handler for download icon
             downloadIcon.addEventListener('click', async () => {
@@ -1005,7 +1424,6 @@ function displayFinishedAnimations() {
                         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
                     </svg>
                 `;
-
                 try {
                     // Load the logo
                     const logo = await new Promise((resolve, reject) => {
@@ -1015,7 +1433,6 @@ function displayFinishedAnimations() {
                         logoImg.onerror = reject;
                         logoImg.src = 'logo1.jpg';
                     });
-
                     const gif = new GIF({
                         workers: 2,
                         quality: 10,
@@ -1023,7 +1440,6 @@ function displayFinishedAnimations() {
                         height: img.naturalHeight || 300,
                         background: '#FFFFFF'
                     });
-
                     // Load all images first
                     const loadedImages = await Promise.all(processedImages[effect].map(imageData => {
                         return new Promise((resolve) => {
@@ -1032,46 +1448,11 @@ function displayFinishedAnimations() {
                             tempImg.src = imageData.dataUrl;
                         });
                     }));
-
                     // Add frames to the GIF with logo
                     loadedImages.forEach(loadedImg => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-
-                        canvas.width = loadedImg.width;
-                        canvas.height = loadedImg.height;
-                        
-                        // Fill canvas with white background first
-                        ctx.fillStyle = '#FFFFFF';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        // Draw original image
-                        ctx.drawImage(loadedImg, 0, 0);
-
-                        // Calculate logo size and position
-                        const logoSize = {
-                            width: loadedImg.width * 0.1,
-                            height: loadedImg.height * 0.05
-                        };
-
-                        const logoPosition = {
-                            x: canvas.width - logoSize.width - 10,
-                            y: canvas.height - logoSize.height - 10
-                        };
-
-                        // Draw the logo
-                        ctx.drawImage(
-                            logo,
-                            logoPosition.x,
-                            logoPosition.y,
-                            logoSize.width,
-                            logoSize.height
-                        );
-
-                        // Add the frame to the GIF
+                        const canvas = createWatermarkedFrame(loadedImg, logo);
                         gif.addFrame(canvas, { delay: 200 });
                     });
-
                     // Render the GIF
                     gif.on('finished', (blob) => {
                         const url = URL.createObjectURL(blob);
@@ -1080,15 +1461,12 @@ function displayFinishedAnimations() {
                         a.download = `${effect}-animation.gif`;
                         document.body.appendChild(a);
                         a.click();
-
                         setTimeout(() => {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(url);
                         }, 100);
-
                         downloadIcon.innerHTML = originalContent;
                     });
-
                     gif.render();
                 } catch (error) {
                     console.error('Error creating GIF:', error);
@@ -1105,217 +1483,97 @@ function displayFinishedAnimations() {
                 }
             });
 
-
-           
-         
-            // Add a loading state variable
-let isGenerating = false;
-
-let isSharing = false; // Track if a share operation is in progress
-
-shareIcon.addEventListener('click', async (event) => {
-  // Prevent multiple clicks while sharing
-  if (isSharing) {
-    console.log('A share operation is already in progress.');
-    return;
-  }
-
-  try {
-    isSharing = true; // Set sharing state to true
-    shareIcon.disabled = true; // Disable the share button
-    shareIcon.textContent = 'Generating...'; // Update UI to indicate loading
-
-    // Load the watermark logo
-    const logo = await loadWatermarkLogo('logo1.jpg');
-
-    // Initialize GIF
-    const gif = new GIF({
-      workers: 2,
-      quality: 10,
-      width: img.naturalWidth || 400,
-      height: img.naturalHeight || 300,
-      background: '#FFFFFF'
-    });
-
-    // Load all processed images
-    const loadedImages = await Promise.all(
-      processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
-    );
-
-    // Process frames and add watermark
-    loadedImages.forEach(loadedImg => {
-      const canvas = createWatermarkedFrame(loadedImg, logo);
-      gif.addFrame(canvas, { delay: 200 });
-    });
-
-    // Render the GIF
-    const gifPromise = new Promise((resolve, reject) => {
-      gif.on('finished', resolve);
-      gif.on('error', reject);
-    });
-
-    gif.render();
-
-    // Wait for the GIF to finish rendering
-    const blob = await gifPromise;
-    const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
-
-    // Prepare share data
-    const shareData = {
-      title: 'Check out this animation!',
-      text: `Created using Imaginea. Visit ${window.location.href} for more.`,
-      files: [file]
-    };
-
-    // Check if sharing is supported and allowed
-    if (navigator.share && navigator.canShare(shareData)) {
-      await navigator.share(shareData);
-    } else {
-      // Fallback: Copy link to clipboard
-      await navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-
-  } catch (error) {
-    console.error('Error sharing GIF:', error);
-
-    // Handle specific errors
-    if (error.name === 'NotAllowedError') {
-      alert('Sharing canceled.');
-    } else if (error.name === 'AbortError') {
-      alert('Sharing was aborted.');
-    } else {
-      alert('Error sharing. Please try again.');
-    }
-  } finally {
-    // Reset UI state
-    isSharing = false;
-    shareIcon.disabled = false;
-    shareIcon.textContent = 'Share'; // Reset to original state
-  }
-});
-
-
-
-    async function loadWatermarkLogo(logoPath) {
-        return new Promise((resolve, reject) => {
-        const logo = new Image();
-        logo.crossOrigin = "anonymous";
-        logo.onload = () => resolve(logo);
-        logo.onerror = (error) => reject(new Error(`Failed to load logo: ${error.message}`));
-        logo.src = logoPath;
-        });
-    }
-
-  async function loadImage(dataUrl) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = (error) => reject(new Error(`Failed to load image: ${error.message}`));
-      img.src = dataUrl;
-    });
-  }
-  
-
-  function createWatermarkedFrame(image, logo) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-  
-    canvas.width = image.width;
-    canvas.height = image.height;
-  
-    // Fill canvas with white background
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-    // Draw the original image
-    ctx.drawImage(image, 0, 0);
-  
-    // Calculate logo size and position
-    const logoSize = {
-      width: image.width * 0.1,
-      height: image.height * 0.05
-    };
-  
-    const logoPosition = {
-      x: canvas.width - logoSize.width - 10,
-      y: canvas.height - logoSize.height - 10
-    };
-  
-    // Draw the logo
-    ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
-  
-    return canvas;
-  }
-
-              // Helper Functions
-              
-              function createWatermarkedFrame(image, logo) {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Set canvas dimensions
-                canvas.width = image.width;
-                canvas.height = image.height;
-                
-                // Draw white background
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw the main image
-                ctx.drawImage(image, 0, 0);
-                
-                // Calculate logo dimensions and position
-                const logoSize = {
-                  width: image.width * 0.1,
-                  height: image.height * 0.05
-                };
-                const logoPosition = {
-                  x: canvas.width - logoSize.width - 10,
-                  y: canvas.height - logoSize.height - 10
-                };
-                
-                // Draw the logo
-                ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
-                
-                return canvas;
-              }
-              
-              async function createGifFile(blob, effect) {
-                return new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
-              }
-              
-              async function shareGifContent(file) {
-                const shareData = {
-                  title: 'Check out this animation!',
-                  text: `Created using Imaginea. Visit ${window.location.href} for more.`,
-                  files: [file]
-                };
-              
-                if (navigator.share && navigator.canShare(shareData)) {
-                  await navigator.share(shareData);
-                } else {
-                  // Fallback to clipboard
-                  await navigator.clipboard.writeText(window.location.href);
-                  alert('Link copied to clipboard!');
+            // Add sharing functionality
+            let isSharing = false;
+            shareIcon.addEventListener('click', async (event) => {
+                if (isSharing) {
+                    console.log('A share operation is already in progress.');
+                    return;
                 }
-              }
-              
-              function handleError(error) {
-                console.error('Error sharing GIF:', error);
-                alert('Sharing failed. Please try again.');
-              }
+                try {
+                    isSharing = true;
+                    shareIcon.disabled = true;
+                    const originalContent = shareIcon.innerHTML;
+                    shareIcon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        </svg>
+                    `;
 
+                    const logo = await loadWatermarkLogo('logo1.jpg');
+                    const gif = new GIF({
+                        workers: 2,
+                        quality: 10,
+                        width: img.naturalWidth || 400,
+                        height: img.naturalHeight || 300,
+                        background: '#FFFFFF'
+                    });
 
-            wrapper.appendChild(downloadIcon);
-            wrapper.appendChild(shareIcon);    
+                    const loadedImages = await Promise.all(
+                        processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
+                    );
+
+                    loadedImages.forEach(loadedImg => {
+                        const canvas = createWatermarkedFrame(loadedImg, logo);
+                        gif.addFrame(canvas, { delay: 200 });
+                    });
+
+                    const gifPromise = new Promise((resolve, reject) => {
+                        gif.on('finished', resolve);
+                        gif.on('error', reject);
+                    });
+                    gif.render();
+
+                    const blob = await gifPromise;
+                    const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+
+                    const shareData = {
+                        title: 'Check out this animation!',
+                        text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+                        files: [file]
+                    };
+
+                    if (navigator.share && navigator.canShare(shareData)) {
+                        await navigator.share(shareData);
+                    } else {
+                        await navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                    }
+                } catch (error) {
+                    console.error('Error sharing GIF:', error);
+                    if (error.name === 'NotAllowedError') {
+                        alert('Sharing canceled.');
+                    } else if (error.name === 'AbortError') {
+                        alert('Sharing was aborted.');
+                    } else {
+                        alert('Error sharing. Please try again.');
+                    }
+                } finally {
+                    isSharing = false;
+                    shareIcon.disabled = false;
+                    shareIcon.innerHTML = originalContent;
+                }
+            });
+
+            // Add fullscreen functionality
+            fullscreenIcon.addEventListener('click', () => {
+                enterFullscreen(wrapper, img);
+            });
+
+            // Add all icons to the container
+            iconContainer.appendChild(downloadIcon);
+            iconContainer.appendChild(shareIcon);
+            iconContainer.appendChild(fullscreenIcon);
+
+            // Add the icon container to the wrapper
+            wrapper.appendChild(iconContainer);
 
             // Add the wrapper to the container
             container.appendChild(wrapper);
-
+            
             // Add the container to the results
             resultsContainer.appendChild(container);
-
+            
             // Animate the images
             let currentFrame = 0;
             function animate() {
@@ -1327,6 +1585,403 @@ shareIcon.addEventListener('click', async (event) => {
         }
     });
 }
+
+// function displayFinishedAnimations() {
+//     resultsContainer.innerHTML = ''; // Clear existing content
+//     addDownloadAllButton();
+//     // Iterate through all effects
+//     effects.forEach(effect => {
+//         if (animationStatus[effect] && processedImages[effect]?.length > 0) {
+//             // Create a container for the effect
+//             const container = document.createElement('div');
+//             container.className = 'effect-container';
+
+//             // Add a label for the effect
+//             const label = document.createElement('div');
+//             label.className = 'effect-label';
+//             label.textContent = effect; // Use the effect name as the label
+//             container.appendChild(label);
+
+//             // Create a wrapper for the animation
+//             const wrapper = document.createElement('div');
+//             wrapper.className = 'canvas-wrapper';
+
+//             // Create the image element for the animation
+//             const img = new Image();
+//             img.id = `${effect}-image`;
+//             img.className = 'processed-image';
+
+//             // Add the image to the wrapper
+//             wrapper.appendChild(img);
+
+//             // Add a download icon
+//             const downloadIcon = document.createElement('div');
+//             downloadIcon.className = 'download-icon';
+//             downloadIcon.innerHTML = `
+//                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
+//                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+//                     <polyline points="7 10 12 15 17 10"/>
+//                     <line x1="12" y1="15" x2="12" y2="3"/>
+//                 </svg>
+//             `;
+
+
+//             const shareIcon = document.createElement('div');
+//             shareIcon.className = 'share-icon';
+//             shareIcon.innerHTML = `
+//                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-2">
+//                     <circle cx="18" cy="5" r="3"/>
+//                     <circle cx="6" cy="12" r="3"/>
+//                     <circle cx="18" cy="19" r="3"/>
+//                     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+//                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+//                 </svg>
+//             `;
+
+//             const fullscreenIcon = document.createElement('div');
+//             fullscreenIcon.className = 'fullscreen-icon';
+//             fullscreenIcon.innerHTML = `
+//                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize">
+//                     <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+//                 </svg>
+//             `;
+
+//             fullscreenIcon.addEventListener('click', () => {
+//                 enterFullscreen(wrapper, img);
+//             });
+
+//             wrapper.appendChild(fullscreenIcon);    
+
+//             // Add click handler for download icon
+//             downloadIcon.addEventListener('click', async () => {
+//                 const originalContent = downloadIcon.innerHTML;
+//                 downloadIcon.innerHTML = `
+//                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 animate-spin">
+//                         <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+//                     </svg>
+//                 `;
+
+//                 try {
+//                     // Load the logo
+//                     const logo = await new Promise((resolve, reject) => {
+//                         const logoImg = new Image();
+//                         logoImg.crossOrigin = "anonymous";
+//                         logoImg.onload = () => resolve(logoImg);
+//                         logoImg.onerror = reject;
+//                         logoImg.src = 'logo1.jpg';
+//                     });
+
+//                     const gif = new GIF({
+//                         workers: 2,
+//                         quality: 10,
+//                         width: img.naturalWidth || 400,
+//                         height: img.naturalHeight || 300,
+//                         background: '#FFFFFF'
+//                     });
+
+//                     // Load all images first
+//                     const loadedImages = await Promise.all(processedImages[effect].map(imageData => {
+//                         return new Promise((resolve) => {
+//                             const tempImg = new Image();
+//                             tempImg.onload = () => resolve(tempImg);
+//                             tempImg.src = imageData.dataUrl;
+//                         });
+//                     }));
+
+//                     // Add frames to the GIF with logo
+//                     loadedImages.forEach(loadedImg => {
+//                         const canvas = document.createElement('canvas');
+//                         const ctx = canvas.getContext('2d');
+
+//                         canvas.width = loadedImg.width;
+//                         canvas.height = loadedImg.height;
+                        
+//                         // Fill canvas with white background first
+//                         ctx.fillStyle = '#FFFFFF';
+//                         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+//                         // Draw original image
+//                         ctx.drawImage(loadedImg, 0, 0);
+
+//                         // Calculate logo size and position
+//                         const logoSize = {
+//                             width: loadedImg.width * 0.1,
+//                             height: loadedImg.height * 0.05
+//                         };
+
+//                         const logoPosition = {
+//                             x: canvas.width - logoSize.width - 10,
+//                             y: canvas.height - logoSize.height - 10
+//                         };
+
+//                         // Draw the logo
+//                         ctx.drawImage(
+//                             logo,
+//                             logoPosition.x,
+//                             logoPosition.y,
+//                             logoSize.width,
+//                             logoSize.height
+//                         );
+
+//                         // Add the frame to the GIF
+//                         gif.addFrame(canvas, { delay: 200 });
+//                     });
+
+//                     // Render the GIF
+//                     gif.on('finished', (blob) => {
+//                         const url = URL.createObjectURL(blob);
+//                         const a = document.createElement('a');
+//                         a.href = url;
+//                         a.download = `${effect}-animation.gif`;
+//                         document.body.appendChild(a);
+//                         a.click();
+
+//                         setTimeout(() => {
+//                             document.body.removeChild(a);
+//                             URL.revokeObjectURL(url);
+//                         }, 100);
+
+//                         downloadIcon.innerHTML = originalContent;
+//                     });
+
+//                     gif.render();
+//                 } catch (error) {
+//                     console.error('Error creating GIF:', error);
+//                     downloadIcon.innerHTML = `
+//                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle">
+//                             <circle cx="12" cy="12" r="10"/>
+//                             <line x1="12" y1="8" x2="12" y2="12"/>
+//                             <line x1="12" y1="16" x2="12.01" y2="16"/>
+//                         </svg>
+//                     `;
+//                     setTimeout(() => {
+//                         downloadIcon.innerHTML = originalContent;
+//                     }, 2000);
+//                 }
+//             });
+
+
+           
+         
+//             // Add a loading state variable
+// let isGenerating = false;
+
+// let isSharing = false; // Track if a share operation is in progress
+
+// shareIcon.addEventListener('click', async (event) => {
+//   // Prevent multiple clicks while sharing
+//   if (isSharing) {
+//     console.log('A share operation is already in progress.');
+//     return;
+//   }
+
+//   try {
+//     isSharing = true; // Set sharing state to true
+//     shareIcon.disabled = true; // Disable the share button
+//     shareIcon.textContent = 'Generating...'; // Update UI to indicate loading
+
+//     // Load the watermark logo
+//     const logo = await loadWatermarkLogo('logo1.jpg');
+
+//     // Initialize GIF
+//     const gif = new GIF({
+//       workers: 2,
+//       quality: 10,
+//       width: img.naturalWidth || 400,
+//       height: img.naturalHeight || 300,
+//       background: '#FFFFFF'
+//     });
+
+//     // Load all processed images
+//     const loadedImages = await Promise.all(
+//       processedImages[effect].map(imageData => loadImage(imageData.dataUrl))
+//     );
+
+//     // Process frames and add watermark
+//     loadedImages.forEach(loadedImg => {
+//       const canvas = createWatermarkedFrame(loadedImg, logo);
+//       gif.addFrame(canvas, { delay: 200 });
+//     });
+
+//     // Render the GIF
+//     const gifPromise = new Promise((resolve, reject) => {
+//       gif.on('finished', resolve);
+//       gif.on('error', reject);
+//     });
+
+//     gif.render();
+
+//     // Wait for the GIF to finish rendering
+//     const blob = await gifPromise;
+//     const file = new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+
+//     // Prepare share data
+//     const shareData = {
+//       title: 'Check out this animation!',
+//       text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+//       files: [file]
+//     };
+
+//     // Check if sharing is supported and allowed
+//     if (navigator.share && navigator.canShare(shareData)) {
+//       await navigator.share(shareData);
+//     } else {
+//       // Fallback: Copy link to clipboard
+//       await navigator.clipboard.writeText(window.location.href);
+//       alert('Link copied to clipboard!');
+//     }
+
+//   } catch (error) {
+//     console.error('Error sharing GIF:', error);
+
+//     // Handle specific errors
+//     if (error.name === 'NotAllowedError') {
+//       alert('Sharing canceled.');
+//     } else if (error.name === 'AbortError') {
+//       alert('Sharing was aborted.');
+//     } else {
+//       alert('Error sharing. Please try again.');
+//     }
+//   } finally {
+//     // Reset UI state
+//     isSharing = false;
+//     shareIcon.disabled = false;
+//     shareIcon.textContent = 'Share'; // Reset to original state
+//   }
+// });
+
+
+
+//     async function loadWatermarkLogo(logoPath) {
+//         return new Promise((resolve, reject) => {
+//         const logo = new Image();
+//         logo.crossOrigin = "anonymous";
+//         logo.onload = () => resolve(logo);
+//         logo.onerror = (error) => reject(new Error(`Failed to load logo: ${error.message}`));
+//         logo.src = logoPath;
+//         });
+//     }
+
+//   async function loadImage(dataUrl) {
+//     return new Promise((resolve, reject) => {
+//       const img = new Image();
+//       img.onload = () => resolve(img);
+//       img.onerror = (error) => reject(new Error(`Failed to load image: ${error.message}`));
+//       img.src = dataUrl;
+//     });
+//   }
+  
+
+//   function createWatermarkedFrame(image, logo) {
+//     const canvas = document.createElement('canvas');
+//     const ctx = canvas.getContext('2d');
+  
+//     canvas.width = image.width;
+//     canvas.height = image.height;
+  
+//     // Fill canvas with white background
+//     ctx.fillStyle = '#FFFFFF';
+//     ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+//     // Draw the original image
+//     ctx.drawImage(image, 0, 0);
+  
+//     // Calculate logo size and position
+//     const logoSize = {
+//       width: image.width * 0.1,
+//       height: image.height * 0.05
+//     };
+  
+//     const logoPosition = {
+//       x: canvas.width - logoSize.width - 10,
+//       y: canvas.height - logoSize.height - 10
+//     };
+  
+//     // Draw the logo
+//     ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+  
+//     return canvas;
+//   }
+
+//               // Helper Functions
+              
+//               function createWatermarkedFrame(image, logo) {
+//                 const canvas = document.createElement('canvas');
+//                 const ctx = canvas.getContext('2d');
+                
+//                 // Set canvas dimensions
+//                 canvas.width = image.width;
+//                 canvas.height = image.height;
+                
+//                 // Draw white background
+//                 ctx.fillStyle = '#FFFFFF';
+//                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+//                 // Draw the main image
+//                 ctx.drawImage(image, 0, 0);
+                
+//                 // Calculate logo dimensions and position
+//                 const logoSize = {
+//                   width: image.width * 0.1,
+//                   height: image.height * 0.05
+//                 };
+//                 const logoPosition = {
+//                   x: canvas.width - logoSize.width - 10,
+//                   y: canvas.height - logoSize.height - 10
+//                 };
+                
+//                 // Draw the logo
+//                 ctx.drawImage(logo, logoPosition.x, logoPosition.y, logoSize.width, logoSize.height);
+                
+//                 return canvas;
+//               }
+              
+//               async function createGifFile(blob, effect) {
+//                 return new File([blob], `${effect}-animation.gif`, { type: 'image/gif' });
+//               }
+              
+//               async function shareGifContent(file) {
+//                 const shareData = {
+//                   title: 'Check out this animation!',
+//                   text: `Created using Imaginea. Visit ${window.location.href} for more.`,
+//                   files: [file]
+//                 };
+              
+//                 if (navigator.share && navigator.canShare(shareData)) {
+//                   await navigator.share(shareData);
+//                 } else {
+//                   // Fallback to clipboard
+//                   await navigator.clipboard.writeText(window.location.href);
+//                   alert('Link copied to clipboard!');
+//                 }
+//               }
+              
+//               function handleError(error) {
+//                 console.error('Error sharing GIF:', error);
+//                 alert('Sharing failed. Please try again.');
+//               }
+
+
+//             wrapper.appendChild(downloadIcon);
+//             wrapper.appendChild(shareIcon);    
+
+//             // Add the wrapper to the container
+//             container.appendChild(wrapper);
+
+//             // Add the container to the results
+//             resultsContainer.appendChild(container);
+
+//             // Animate the images
+//             let currentFrame = 0;
+//             function animate() {
+//                 img.src = processedImages[effect][currentFrame].dataUrl;
+//                 currentFrame = (currentFrame + 1) % processedImages[effect].length;
+//                 setTimeout(animate, 200);
+//             }
+//             animate();
+//         }
+//     });
+// }
 
 async function processImage(img) {
 
@@ -2088,6 +2743,9 @@ function displayAllAnimations() {
                 img.className = 'processed-image';
                 
                 wrapper.appendChild(img);
+
+
+               
                 container.appendChild(wrapper);
                 resultsContainer.appendChild(container);
                 

@@ -16,43 +16,7 @@
     z-index: 1000; /* Ensure it's above other elements */
 }
 
-/* Add this CSS to your stylesheet */
-@keyframes creditPop {
-    0% {
-        transform: scale(1);
-        color: inherit;
-    }
-    50% {
-        transform: scale(1.3);
-        color: #4CAF50;
-    }
-    100% {
-        transform: scale(1);
-        color: inherit;
-    }
-}
 
-.credit-update-animation {
-    animation: creditPop 0.5s ease-in-out;
-    display: inline-block;
-}
-
-/* Optional glow effect */
-@keyframes creditGlow {
-    0% {
-        text-shadow: none;
-    }
-    50% {
-        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-    }
-    100% {
-        text-shadow: none;
-    }
-}
-
-.credit-glow {
-    animation: creditGlow 0.5s ease-in-out;
-}
 .share-icon {
     position: absolute;
     right: 10px;
@@ -486,6 +450,51 @@ button {
     border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
     z-index: 100;
 } */
+
+
+.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-mode .processed-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+}
+
+.fullscreen-icon, .shrink-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background-color 0.3s ease;
+}
+
+.fullscreen-icon:hover, .shrink-icon:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.fullscreen-icon svg, .shrink-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+}
 
 
 #mainContent {flex-grow: 1;
@@ -1143,15 +1152,23 @@ width: 350px !important;
 }
 
 .canvas-wrapper {
+    position: relative;
     display: inline-block;
     max-width: 300px;
+    display: inline-block; 
+        width: 300px;
+        height: 300px;
+        margin: 5px; 
+        text-align: center;
     margin: 10px;
     text-align: center;
     background: #000000;
+    overflow: hidden; /* Ensure the animation stays within bounds */
     padding: 15px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(145, 145, 145, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
 }
 
 .canvas-wrapper img {
@@ -1170,13 +1187,6 @@ width: 350px !important;
     box-shadow: 0 8px 25px rgba(223, 223, 223, 0.2);
 }
 
-
-
-    .canvas-wrapper {display: inline-block; 
-        width: 300px;
-        height: 300px;
-        margin: 5px; 
-        text-align: center;}
 
 
         .top-centered-container {
@@ -1257,9 +1267,11 @@ canvas,
 }
 
 #resultsContainer {
-    display: flex;
+    /* display: grid; */
+    /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); Responsive grid */
     flex-direction: column;
-    gap: 20px;
+    gap: 5px;
+    padding: 5px;
     max-height: 80vh; /* Adjust based on your layout */
     overflow-y: auto; /* Add a vertical scrollbar */
     padding-right: 10px; /* Add some padding for the scrollbar */
@@ -1293,7 +1305,20 @@ canvas,
 .processed-image {
     width: 100%; /* Adjust as needed */
     height: auto; /* Adjust as needed */
+    object-fit: contain; /* Ensure the GIF fits well */
+    display: block; /* Remove inline spacing */
+    animation: fade 1s infinite; 
 }
+
+@keyframes fade {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
 
 .image-sequence-container {
     position: relative;

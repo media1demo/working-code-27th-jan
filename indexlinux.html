@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-87LBKLRFYV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-87LBKLRFYV');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video generator</title>
+    <link rel="stylesheet" href="styles2.css">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
+    <script src = "effects.js"></script>
+    <script src = "tutorial.js"></script>
+    <script src = "removewatermark.js"></script>
+    <script src = "objremovelipsync.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+</head>
+<h1 style="display: none;">Image to Animation without GPU</h1>
+
+<body>
+    <div class="hamburger-menu">
+        <button class="hamburger-button">☰</button>
+        <div class="dropdown-content">
+            <button id="refundBtn">Refund Policy</button>
+            <button id="policyBtn">Privacy Policy</button>
+            <button id="tncBtn">Terms & Conditions</button>
+            <button id="bulkimageid"> Bulk Image generator</button>
+        </div>
+    </div>
+    
+    <div id="contactBar" style="
+        background: #1a1a2e;
+        color: white;
+        padding: 2px;
+        text-align: center;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+    ">
+    Contact us: <a href="mailto:stejas809@gmail.com" style="color: white; text-decoration: none;">stejas809@gmail.com</a> | 
+    Phone: <a href="tel:+918850362898" style="color: white; text-decoration: none;">+91-8850362898</a>
+</div>
+    <div id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1200; justify-content: center; align-items: center;">
+        <div id="videoModalContent" style="background: #2a2a4f; padding: 20px; border-radius: 15px; 
+        min-width: 85%; min-height: 80%; max-width: 95%; max-height: 90%; /* increased size */
+        display: flex; flex-direction: column; gap: 15px;">
+       <iframe id="youtubeVideo" width="720" height="405"  <!-- Larger iframe -->
+               src="" frameborder="0" allowfullscreen></iframe>
+       <div style="color: white; text-align: center;">
+           <h3>Need Help?</h3>
+           <p>Contact our support team:<br>
+           Email: stejas809@gmail.com<br>
+           Phone: +91-8850362898</p>
+       </div>
+   </div>
+        <button id="closeVideoModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
+    </div>
+    <div id="pricingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1100; justify-content: center; align-items: center;">
+        <div id="modalContent" style="background: #000000; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 90%; overflow-y: auto; display: flex; gap: 20px; flex-wrap: nowrap; min-width: 80%;">
+            <!-- Content from pricing.html will be inserted here -->
+        </div>
+        <button id="closeModal" style="position: absolute; top: 20px; right: 20px; background: #ff4757; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">Close</button>
+    </div>
+    <div class="top-nav">
+        <div id="creditSystem">
+            <div id="creditBalance">Credits: 0</div>
+            <button id="buyCredits">Buy Credits</button>
+            <button id="startFreeTrial">Start Free Trial</button>
+        </div>
+    </div>
+    <div class="top-centered-container">
+        <button id="investorRelations" class="centered-button" style="display: none;">
+            Investor Relations
+        </button>
+    </div>
+    <img id="sourceImage" crossorigin="anonymous" style="display: none;">
+    <div id="mainContainer" style="display: none;">
+    </div>
+    <canvas id="visualizationCanvas" style="display: none;"></canvas>
+    <div id="imageDisplay" class="image-container"></div>
+    <div id="searchBarContainer">
+        <input type="text" id="effectSearchBar" placeholder="Search for effects...">
+    </div>
+    <div id="sidebar">
+        <button id = "magicWandTool" style="display: none;">.</button>
+     <button id="lassoTool">Lasso Tool</button>
+         <button id="polygonLassoTool">Polygon Lasso Tool</button> <!-- New button -->
+         <button id="circleMagicWandTool">Circle Magic Wand</button>
+        <div class="timer-wrapper">
+            <div class="timer-container">
+                    <div class="digital-timer" id="timer">00:000</div>
+                    <div class="timer-label"></div>
+            </div>
+        </div>
+        
+        <div class="controls" id = "side1barcontrols">
+            <input type="file" id="imageUpload" accept="image/*">
+            <label for="imageCount">Number of images per effect:</label>
+            <input type="number" id="imageCount" min="1" max="100" value="3">
+            <button id="processButton">Process Image</button>
+            <select id="actionSelect" class="action-dropdown">   
+                <option value="">Select Action</option>
+                <option value="visualizeBtn" id="visualizeBtn">Visualize</option>
+                <option value="visualizeBtn1" id="visualizeBtn1">Visualizesmall</option>
+                <option value="keypointsButton" id="keypointsButton">Hand</option>
+                <option value="legButton" id="legButton">Leg</option>
+                <option value="legButton1" id="legButton1">Left Foot</option>
+                <option value="legButton2" id="legButton2">Right Foot</option>
+                <option value="leftlegonlyid" id="leftlegonlyid">Left Leg Only</option>
+                <option value="rightlegonlyid" id="rightlegonlyid">Right Leg Only</option>
+                <option value="rightarmonlyid" id="rightarmonlyid">Right Arm Only</option>
+                <option value="leftarmonlyid" id="leftarmonlyid">Left Arm Only</option>
+            </select>
+            <div>
+                <label for="widthInput">Target Width:</label>
+                <input type="number" id="widthInput" min="1" step="1">
+            </div>
+            <div>
+                <label for="heightInput">Target Height:</label>
+                <input type="number" id="heightInput" min="1" step="1">
+            </div>
+            <button id="resizeButton">Resize Image</button>
+            <button id="toggleDraw">Toggle Draw Mode</button>
+            <button id="removeObject">Remove Object</button>
+            <button id="lipSyncButton">Lip Sync Animation</button> <!-- New button -->
+            <button id="generateImages">Generate Images</button> <!-- Brightness button -->
+            <button id="removeWatermarkButton">Remove Watermark</button>
+            <label for="brightness">Max Brightness Change:</label>
+            <button id="addMagicWand">Addmagicwand</button>
+            <button id="subtractMagicWand">Subtractmagicwand</button>
+            <button id="invertMagicWand">Invertmagicwand</button>
+            <input type="range" id="brightness" min="0" max="255" value="100">
+            <input type="number" id="value1" value="0">
+            <input type="number" id="value2" value="0">
+            <input type="number" id="value3" value="0">
+            <input type="number" id="value4" value="0">
+            <input type="number" id="value5" value="0">
+            <button id="fastProcessButton">Fast Process</button>
+        </div>
+        
+        <div id="selectAllCheckboxControl">
+            <input type="checkbox" id="selectAllCheckbox">
+            <label for="selectAllCheckbox">Select All Effects</label>
+        </div>
+    </div>
+    <div id="masterCheckboxControl">
+        <input type="checkbox" id="masterCheckbox" checked>
+        <label for="masterCheckbox">Select/Unselect All</label>
+    </div>
+
+    <div id="mainContent">
+        <div id="imageContainer">
+            <div class="image-wrapper" >
+                <img id="originalImage" alt="Original Image" style ="display: none;">
+            </div>
+            <div class="image-wrapper">
+                <img id="segmentedImage" alt="Segmented Image" style ="display: none;">
+            </div>
+        </div>    
+        <div id="resultsContainer">
+         
+        </div>
+        <canvas id="imageCanvas"></canvas>
+        <div id="generatedImages"></div>
+        <div id="segmentsContainer"></div>
+        <div id="progress"></div> <!-- Added progress div -->
+        <div id = "canvasContainer"></div>
+
+        <!-- <div id="imageContainer">
+            <div class="image-wrapper" >
+           
+                
+                <img id="originalImage" alt="Original Image" style ="display: none;">
+            </div>
+            <div class="image-wrapper">
+           
+                
+                <img id="segmentedImage" alt="Segmented Image" style ="display: none;">
+            </div>
+        </div> -->
+    
+    </div>
+
+    <div id="effectControls"></div>
+    <script src= "main.js"></script>
+
+<script>
+
+
+
+let credits = parseInt(localStorage.getItem('credits')) || 10000;
+let freeTrialInterval = null;
+window.basicPlanSelected = false;
+window.standardPlanSelected = false;
+
+function updateCreditBalance() {
+    document.getElementById('creditBalance').textContent = `Credits: ${credits}`;
+    localStorage.setItem('credits', credits);
+}
+
+const PRICE_PLANS = {
+    'basic': { credits: 10000, price: 29 },     // Basic plan ($29)
+    'standard': { credits: 1000000, price: 299 } // Standard plan ($299)
+};
+
+let processedSubscriptions = JSON.parse(localStorage.getItem('processedSubscriptions') || '[]');
+let paymentCheckInterval = null;
+const PAYMENT_CHECK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+const PAYMENT_CHECK_FREQUENCY = 60 * 500; // 0.1 minute in milliseconds
+
+function getUrlParams(url) {
+    let params = {};
+    const queryString = url.split('?')[1];
+    if (queryString) {
+        const pairs = queryString.split('&');
+        for (let pair of pairs) {
+            const [key, value] = pair.split('=');
+            params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+        }
+    }
+    return params;
+}
+
+
+
+
+function checkPaymentStatus() {
+    try {
+        const newurl = window.parent.location.href;
+        console.log(newurl);
+        
+        // Parse URL parameters
+        const params = getUrlParams(newurl);
+        const status = params.status;
+        
+        // Check if status is active or succeeded
+        if (status === 'active' || status === 'succeeded') {
+            console.log(`Payment successful with status: ${status}`);
+            
+            // Add credits based on which button was clicked
+            if (window.basicPlanSelected) {
+                credits += 10000;
+                alert("Added 10,000 credits to your account!");
+                window.basicPlanSelected = false; // Reset the flag
+            } else if (window.standardPlanSelected) {
+                credits += 1000000;
+                alert("Added 1,000,000 credits to your account!");
+                window.standardPlanSelected = false; // Reset the flag
+            }
+            
+            // Update credit balance display
+            updateCreditBalance();
+            document.getElementById('creditBalance').textContent = credits;
+        }
+        
+        // alert(newurl);
+    } catch (error) {
+        console.error("Cannot access parent frame URL due to same-origin policy:", error);
+    }
+}
+
+
+document.getElementById('buyCredits').addEventListener('click', () => {
+    // Show the pricing modal
+    document.getElementById('pricingModal').style.display = 'flex';
+    
+    // Load pricing content dynamically
+    fetch('pricing.html')
+        .then(response => response.text())
+        .then(html => {
+            // Insert the pricing content into the modal
+            document.getElementById('modalContent').innerHTML = html;
+            
+            // Add event listeners to the buttons
+            if (document.querySelector('.basic button')) {
+                document.querySelector('.basic button').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Set the basic plan flag in localStorage
+                    localStorage.setItem('basicPlanSelected', 'true');
+                    localStorage.removeItem('standardPlanSelected');
+                    
+                    // Open payment in new window
+                    window.open('https://test.checkout.dodopayments.com/buy/pdt_EitEKFr2ROBL52XAMfGYt?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+                });
+            }
+            
+            if (document.querySelector('.standard button')) {
+                document.querySelector('.standard button').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Set the standard plan flag in localStorage
+                    localStorage.setItem('standardPlanSelected', 'true');
+                    localStorage.removeItem('basicPlanSelected');
+                    
+                    // Open payment in new window
+                    window.open('https://test.checkout.dodopayments.com/buy/pdt_2xGGr4Pc9WSDZrTXx21Wn?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+                });
+            }
+        });
+});
+
+
+window.onload = () => {
+    console.log("Page loaded, checking payment status...");
+    
+    
+    if (freeTrialInterval === null) {
+        freeTrialInterval = setInterval(() => {
+            credits += 2; // 2 credits every minute
+            updateCreditBalance();
+        }, 60000);
+    }
+    
+    // Set up periodic payment checks for 15 minutes
+    if (!paymentCheckInterval) {
+        let checkCount = 0;
+        paymentCheckInterval = setInterval(() => {
+            checkCount++;
+            console.log(`Payment check #${checkCount} using parent frame URL`);
+            if (checkCount >= 6) { // 6 checks at 1-minute intervals
+                clearInterval(paymentCheckInterval);
+                paymentCheckInterval = null;
+                console.log("Completed payment status checks");
+            } else {
+
+                checkPaymentStatus();
+           
+            }
+        }, PAYMENT_CHECK_FREQUENCY);
+    }
+};
+
+
+
+function useCredits() {
+    const selectedEffects = effects.filter(effect => 
+        document.getElementById(`${effect}Checkbox`).checked
+    ).length;
+    
+    const imageCount = parseInt(document.getElementById('imageCount').value) || 3;
+    
+    const totalCreditsRequired = selectedEffects * imageCount;
+    
+    if (credits >= totalCreditsRequired) {
+        credits -= totalCreditsRequired;
+        console.log('credits :>> ', credits);
+        updateCreditBalance();
+        return true;
+    } else {
+        alert(`Not enough credits! You need ${totalCreditsRequired} credits but only have ${credits}.`);
+        return false;
+    }
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    resetHoverTimeout();
+    document.querySelectorAll('.effect-button').forEach(button => {
+    button.addEventListener('mouseenter', () => {
+        resetHoverTimeout();
+        displayEffectImages(button.dataset.effect);
+    });
+});
+
+
+
+FTUE.initialize();
+    
+
+let modalCount = localStorage.getItem('modalCount') || 0;
+            if (modalCount < 2) {
+                openVideoModal('https://www.youtube.com/embed/7h8WZqMG6gU?si=E9DIW9PTURuBS2ZJ');
+                localStorage.setItem('modalCount', ++modalCount);
+            }
+
+            document.getElementById('closeVideoModal').addEventListener('click', closeVideoModal);
+
+            document.getElementById('videoModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeVideoModal();
+                }
+            });
+
+// Event listener for the close button
+document.getElementById('closeVideoModal').addEventListener('click', closeVideoModal);
+
+// Event listener to close the modal when clicking outside of it
+document.getElementById('videoModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeVideoModal();
+    }
+});
+
+    initializeEffectControls();
+
+const effectSearchBar = document.getElementById('effectSearchBar');
+effectSearchBar.addEventListener('input', filterEffects);
+
+updateCreditBalance();
+
+if (freeTrialInterval === null) {
+    freeTrialInterval = setInterval(() => {
+        credits += 2; // 2 credits every minute
+        updateCreditBalance();
+    }, 60000); // 60000 milliseconds = 1 minute
+}
+
+
+
+
+document.getElementById('buyCredits').addEventListener('click', () => {
+    // Show the pricing modal
+    document.getElementById('pricingModal').style.display = 'flex';
+    
+    // Load pricing content dynamically
+    fetch('pricing.html')
+        .then(response => response.text())
+        .then(html => {
+            // Insert the pricing content into the modal
+            document.getElementById('modalContent').innerHTML = html;
+            
+            // Add event listeners to the buttons
+            if (document.querySelector('.basic button')) {
+                document.querySelector('.basic button').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Flag for basic plan credits
+                    let basicCreditsAdded = false;
+                    
+                    // Check if payment is verified before opening payment window
+                    if (window.paymentVerified && !basicCreditsAdded) {
+                        // Add 10,000 credits if payment is verified
+                        credits += 10000;
+                        basicCreditsAdded = true;
+                        updateCreditBalance();
+                        document.getElementById('creditBalance').textContent = credits;
+                        alert("Added 10,000 credits to your account!");
+                    }
+                    
+                    // Open payment in new window
+                    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_EitEKFr2ROBL52XAMfGYt?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+                    
+                    // Check payment window location after a delay
+                    setTimeout(() => {
+                        try {
+                            const redirectedUrl = paymentWindow.location.href;
+                            // alert(redirectedUrl);
+                            
+                            // Check status in the redirected URL
+                            const params = getUrlParams(redirectedUrl);
+                            if ((params.status === 'active' || params.status === 'succeeded') && !basicCreditsAdded) {
+                                credits += 10000;
+                                basicCreditsAdded = true;
+                                updateCreditBalance();
+                                document.getElementById('creditBalance').textContent = credits;
+                                alert("Added 10,000 credits to your account!");
+                            }
+                        } catch(e) {
+                            console.log('Cannot access window location due to same-origin policy');
+                        }
+                    }, 3000);
+                });
+            }
+            
+            if (document.querySelector('.standard button')) {
+                document.querySelector('.standard button').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Flag for standard plan credits
+                    let standardCreditsAdded = false;
+                    
+                    // Check if payment is verified before opening payment window
+                    if (window.paymentVerified && !standardCreditsAdded) {
+                        // Add 1,000,000 credits if payment is verified
+                        credits += 1000000;
+                        standardCreditsAdded = true;
+                        updateCreditBalance();
+                        document.getElementById('creditBalance').textContent = credits;
+                        alert("Added 1,000,000 credits to your account!");
+                    }
+                    
+                    // Open payment in new window
+                    const paymentWindow = window.open('https://test.checkout.dodopayments.com/buy/pdt_2xGGr4Pc9WSDZrTXx21Wn?quantity=1&redirect_url=https://tejas36026.github.io%2Fworking-code-27th-jan', '_blank');
+                    
+                    // Check payment window location after a delay
+                    setTimeout(() => {
+                        try {
+                            const redirectedUrl = paymentWindow.location.href;
+                            // alert(redirectedUrl);
+                            // 
+                            // Check status in the redirected URL
+                            const params = getUrlParams(redirectedUrl);
+                            if ((params.status === 'active' || params.status === 'succeeded') && !standardCreditsAdded) {
+                                credits += 1000000;
+                                standardCreditsAdded = true;
+                                updateCreditBalance();
+                                document.getElementById('creditBalance').textContent = credits;
+                                alert("Added 1,000,000 credits to your account!");
+                            }
+                        } catch(e) {
+                            console.log('Cannot access window location due to same-origin policy');
+                        }
+                    }, 3000);
+                });
+            }
+        });
+});
+
+
+    // Close modal functionality
+    document.getElementById('closeModal').addEventListener('click', () => {
+        document.getElementById('pricingModal').style.display = 'none';
+    });
+
+
+    document.getElementById('investorRelations').addEventListener('click', function() {
+    // Find the iframe in your document
+    const iframe = document.querySelector('iframe');
+    
+    if (iframe) {
+        // Load the banner.html URL into the existing iframe
+        iframe.src = 'https://tejas36026.github.io/working-code-27th-jan/banner.html';
+    } else {
+        // Fallback if no iframe is found
+        console.error('No iframe found in the document');
+        window.open('https://tejas36026.github.io/working-code-27th-jan/banner.html', '_blank');
+        }
+    });
+    
+    document.getElementById('closeModal').addEventListener('click', function () {
+    const pricingModal = document.getElementById('pricingModal');
+    pricingModal.style.display = 'none';
+    });
+
+    document.getElementById('pricingModal').addEventListener('click', function (event) {
+    if (event.target === this) {
+        this.style.display = 'none';
+    }
+    });
+
+    document.getElementById('startFreeTrial').addEventListener('click', () => {
+    if (freeTrialInterval === null) {
+        freeTrialInterval = setInterval(() => {
+            credits += 10; // 10 credits every minute
+            updateCreditBalance();
+        }, 60000); // 60000 milliseconds = 1 minute    
+    }
+    credits += 10000;
+    updateCreditBalance();
+    }   );
+
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const img = document.getElementById('sourceImage');
+            img.src = e.target.result;
+            img.onload = async () => {
+                await loadModels();
+                await prepareSegmentation();
+            };
+        };
+        
+        reader.readAsDataURL(file);
+    });
+
+    const actionSelect = document.getElementById('actionSelect');
+
+    // Add a change event listener to handle all actions
+    actionSelect.addEventListener('change', function(e) {
+    // Get the selected value
+    const selectedAction = e.target.value;
+    // Handle each action based on the selected value
+    switch(selectedAction) {
+        case 'visualizeBtn':
+            startProcessing('visualize');
+            break;
+            case 'visualizeBtn1':
+            startProcessing1('visualize');
+            break;
+        case 'keypointsButton':
+            handcode();
+            break;
+        case 'legButton':
+            legcode();
+            break;
+        case 'legButton1':
+            legfootcode();
+            break;
+        case 'legButton2':
+            rightfootcode();
+            break;
+        case 'leftlegonlyid':
+            leftlegonly();
+            break;
+        case 'rightlegonlyid':
+            rightlegonly();
+            break;
+        case 'rightarmonlyid':
+            rightarmonly();
+            break;
+        case 'leftarmonlyid':
+            leftarmonly();
+            break;
+        }
+    });
+});
+
+    // This part stays the same - just make sure it's passing the URL correctly
+window.addEventListener('message', function(event) {
+  if (event.origin !== 'https://imaginea.store') {
+    return;
+  }
+  
+  if (event.data.type === 'getUrl') {
+    event.source.postMessage({
+      type: 'urlResponse',
+      url: window.location.href
+    }, event.origin);
+  }
+});
+
+    // If you must navigate the parent window from the iframe
+    window.addEventListener('message', function(event) {
+    if (event.origin !== 'https://imaginea.store') {
+        return;
+    }
+    
+    if (event.data.type === 'forceNavigate') {
+        try {
+        // This is a last resort due to security concerns
+        window.location.href = event.data.url;
+        } catch (e) {
+        console.error('Navigation error:', e);
+        }
+    }
+    });
+
+window.addEventListener('load', () => {    
+    const monitoringStartTime = localStorage.getItem('paymentMonitoringStarted');
+    if (monitoringStartTime) {
+        const startTime = parseInt(monitoringStartTime);
+        const elapsedTime = new Date().getTime() - startTime;
+        
+        // If we're still within the 15-minute window, resume monitoring
+        if (elapsedTime < PAYMENT_CHECK_DURATION) {
+            const remainingTime = PAYMENT_CHECK_DURATION - elapsedTime;
+            console.log(`Resuming payment monitoring for remaining ${Math.round(remainingTime/60000)} minutes`);
+            
+            paymentCheckInterval = setInterval(() => {
+                console.log(`Checking payment status at ${new Date().toLocaleTimeString()}`);
+                const currentElapsedTime = new Date().getTime() - startTime;
+                if (currentElapsedTime >= PAYMENT_CHECK_DURATION) {
+                    stopContinuousPaymentCheck();
+                }
+            }, PAYMENT_CHECK_FREQUENCY);
+            
+            setTimeout(() => {
+                stopContinuousPaymentCheck();
+            }, remainingTime);
+       
+        } else {
+            localStorage.removeItem('paymentMonitoringStarted');
+        }
+    }
+});    
+
+function trackVisits() {
+    let visitCount = localStorage.getItem('visitCount');
+    if (visitCount === null) {
+        visitCount = 0;
+    } else {
+        visitCount = parseInt(visitCount);
+    }
+    visitCount++;
+    localStorage.setItem('visitCount', visitCount);
+    return visitCount;
+}
+
+
+// Initialize and start the tutorial
+document.addEventListener('DOMContentLoaded', () => {
+
+    const hamburgerBtn = document.querySelector('.hamburger-button');
+            const dropdownContent = document.querySelector('.dropdown-content');
+
+            // Routes for the pages
+            const routes = {
+                refund: 'https://tejas36026.github.io/working-code-27th-jan/refund.html',
+                policy: 'https://tejas36026.github.io/working-code-27th-jan/policy.html',
+                tnc: 'https://tejas36026.github.io/working-code-27th-jan/TnC.html',
+                bulkimageid: 'https://tejas36026.github.io/working-code-27th-jan/bulkimagegenerator.html'
+            };
+
+            // Toggle hamburger menu
+            hamburgerBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownContent.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdownContent.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+
+            // Setup route buttons
+            document.getElementById('refundBtn').addEventListener('click', () => {
+                window.location.href = routes.refund;
+                dropdownContent.classList.remove('show');
+            });
+
+            document.getElementById('policyBtn').addEventListener('click', () => {
+                window.location.href = routes.policy;
+                dropdownContent.classList.remove('show');
+            });
+
+            document.getElementById('tncBtn').addEventListener('click', () => {
+                window.location.href = routes.tnc;
+                dropdownContent.classList.remove('show');
+            });
+            document.getElementById('bulkimageid').addEventListener('click', () => {
+                window.location.href = routes.bulkimageid;
+                dropdownContent.classList.remove('show');
+            });
+
+
+    const tutorialButton = document.createElement('button');
+    tutorialButton.style.display = "none";
+    tutorialButton.textContent = 'Start Interactive Tutorial';
+    tutorialButton.style.display = "none";
+
+    tutorialButton.style.cssText = `
+    
+        position: fixed;
+        top: 20px;
+        right: 100px;
+        padding: 10px 20px;
+        background: #2a2a4f;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1000;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    `;
+    
+    tutorialButton.addEventListener('mouseenter', () => {
+        tutorialButton.style.background = '#3a3a6f';
+    });
+    
+    tutorialButton.addEventListener('mouseleave', () => {
+        tutorialButton.style.background = '#2a2a4f';
+    });
+    
+    document.body.appendChild(tutorialButton);
+    tutorialButton.style.display = "none";
+
+    //     const tutorial = new ImageProcessingTutorial();
+    //    tutorial.startTutorial();
+
+
+
+    class TutorialManager {
+    constructor() {
+        this.TUTORIAL_KEY = 'tutorial_shown_count';
+    }
+
+    // Get the number of times tutorial has been shown
+    getTutorialCount() {
+        const count = localStorage.getItem(this.TUTORIAL_KEY);
+        return count ? parseInt(count) : 0;
+    }
+
+    // Increment the tutorial count
+    incrementTutorialCount() {
+        const currentCount = this.getTutorialCount();
+        localStorage.setItem(this.TUTORIAL_KEY, currentCount + 1);
+    }
+
+    // Check if tutorial should be shown
+    shouldShowTutorial() {
+        const count = this.getTutorialCount();
+        return count < 2; // Only show for first two visits
+    }
+
+    // Handle tutorial execution
+    executeTutorial() {
+        if (this.shouldShowTutorial()) {
+            const tutorial = new ImageProcessingTutorial();
+            tutorial.startTutorial();
+            this.incrementTutorialCount();
+            return true;
+        }
+        return false;
+    }
+}
+
+// Usage example
+const tutorialManager = new TutorialManager();
+tutorialManager.executeTutorial();
+});
+
+
+
+
+let segmentationResult;
+let processedData = null; 
+let net;
+let imageArray = []; 
+const viewedImages = []; // Array to store images for further processing
+let generatedImages = [];
+
+function processSegmentVariations(imageData, partName) {
+    return new Promise((resolve) => {
+
+        segmentationWorker.postMessage({
+            imageData: imageData.data,
+            partName: partName,
+            width: imageData.width,
+            height: imageData.height
+        });
+
+        segmentationWorker.onmessage = function(e) {
+            const { type, extremePoints, averages, partName } = e.data;
+
+            const variations = [{
+                data: new Uint8ClampedArray(imageData.data),
+                extremePoints: extremePoints,
+                points: {}
+            }];
+            
+            if (!collectedPoints.has(partName)) {
+                collectedPoints.set(partName, []);
+            }
+
+            if (extremePoints && extremePoints.top) collectedPoints.get(partName).push(extremePoints.top);
+            if (extremePoints && extremePoints.bottom) collectedPoints.get(partName).push(extremePoints.bottom);
+
+            // Initialize points object with missing properties
+            Object.keys(BODY_PARTS).forEach(part => {
+                variations[0].points[part] = {
+                    top: null,
+                    bottom: null
+                };
+            });
+
+            if (extremePoints) {
+                variations[0].points[partName] = {
+                    top: extremePoints.top,
+                    bottom: extremePoints.bottom
+                };
+            }
+
+            resolve(variations);
+        };
+    });
+}
+
+
+
+document.getElementById('visualizeBtn1').addEventListener('click', () => {
+    
+
+console.log("visual button clicked");
+startProcessing1('visualize');});
+
+document.getElementById('visualizeBtn').addEventListener('click', () => {startProcessing('visualize');});
+document.getElementById('keypointsButton').addEventListener('click', handcode);
+document.getElementById('legButton').addEventListener('click', legcode);
+document.getElementById('legButton1').addEventListener('click', legfootcode);
+document.getElementById('legButton2').addEventListener('click', rightfootcode);
+document.getElementById('leftlegonlyid').addEventListener('click', leftlegonly);
+document.getElementById('rightlegonlyid').addEventListener('click', rightlegonly);
+document.getElementById('rightarmonlyid').addEventListener('click', rightarmonly);
+document.getElementById('leftarmonlyid').addEventListener('click', leftarmonly);
+
+
+async function prepareSegmentation() {
+    const img = document.getElementById('sourceImage');
+    segmentationResult = await net.segmentPersonParts(img);
+    // alert(segmentationResult)
+}
+
+const segmentationWorker = new Worker('keypoints-worker.js');
+let collectedPoints = new Map();
+
+
+async function loadModels() {
+    net = await bodyPix.load({
+        architecture: 'MobileNetV1',
+        outputStride: 16,
+        multiplier: 0.75,
+        quantBytes: 2
+    });
+}
+        let originalImageData;
+        let maskData; 
+        let size;
+        let objectMask;
+        let lines = [];
+        
+        effects.forEach(effect => {
+            const controlDiv = document.createElement('div');
+            controlDiv.className = 'effect-control';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `${effect}Checkbox`;
+            checkbox.checked = true;
+            checkbox.addEventListener('change', updateMasterCheckbox);
+            const label = document.createElement('label');
+            label.htmlFor = `${effect}Checkbox`;
+            label.textContent = effect;
+            controlDiv.appendChild(checkbox);
+            controlDiv.appendChild(label);
+            effectControls.appendChild(controlDiv);
+        }); 
+        
+        imageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    originalImage = new Image();
+                    originalImage.onload = () => {
+                        imageCanvas.width = originalImage.width;
+                        imageCanvas.height = originalImage.height;
+                        // imageCanvas.id = "icid"
+                        
+                        ctx.drawImage(originalImage, 0, 0);
+                        
+                        originalImageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+                        maskData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height); // Initialize maskData
+                        size = { w: imageCanvas.width, h: imageCanvas.height }; // Initialize size
+                        objectMask = matrix(imageCanvas.width, imageCanvas.height, false); // Initialize objectMask
+
+                    };
+                    originalImage.onerror = (error) => {
+                        console.error('Error loading image:', error);
+                        alert('Failed to load the image. Please try again.');
+                    };
+                    originalImage.src = e.target.result; // Load the image into the canvas
+                };
+                reader.onerror = (error) => {
+                    console.error('Error reading file:', error);
+                    alert('Failed to read the file. Please try again.');
+                };
+                reader.readAsDataURL(file); // Read the file as a data URL
+            }
+        });
+
+        
+        function loadImage() {
+            originalImage = new Image();
+            originalImage.onload = function() {
+                imageCanvas.width = originalImage.width;
+                imageCanvas.height = originalImage.height;
+                ctx.drawImage(originalImage, 0, 0);
+                originalImageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+                maskData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height); // Initialize maskData
+                size = { w: imageCanvas.width, h: imageCanvas.height }; // Initialize size
+                objectMask = matrix(imageCanvas.width, imageCanvas.height, false); // Initialize objectMask
+                window.uploadedImageData = originalImageData;
+                // imageCanvas.id = "icid1"
+
+                displaySelectedRegionsBorders();
+            }
+
+            // originalImage.src = 'face.jpg'; // Ensure this path is correct
+
+        }
+
+
+        </script>
+</body>
+</html>

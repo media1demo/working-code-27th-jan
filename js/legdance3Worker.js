@@ -2,7 +2,7 @@ const DEFAULT_SCALE_FACTOR = 0.15;
 const DEFAULT_ITERATIONS = 120;
 
 let currentIteration = 0;
-
+console.log("1111111111111111111111111111111111111")
 function createTransparentImageData(width, height) {
     return new ImageData(
         new Uint8ClampedArray(width * height * 4),

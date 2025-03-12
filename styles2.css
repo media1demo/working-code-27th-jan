@@ -418,12 +418,6 @@ button {
     transition: background 0.3s ease;
 }
 
-#masterCheckboxControl {
-    /* margin-top: 20px; */
-    /* padding: 15px; */
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
-}
-
 
 
     
@@ -635,9 +629,6 @@ button {
         height: auto;
     }
 
-    #mainContent {
-        /* margin-left: 0; */
-    }
 }
 
 /* Responsive Design */
@@ -646,9 +637,6 @@ button {
         width: 250px;
     }
 
-    #mainContent {
-        /* margin-left: 270px; */
-    }
 }
 
 #mainContent {
@@ -1235,9 +1223,7 @@ width: 350px !important;
         .centered-button:hover {
             background-color: rgba(33, 150, 243, 0.3); /* Slightly more opaque on hover */
         }
-#masterCheckboxControl {
-    /* margin-bottom: 15px; */
-}
+
 
 
 

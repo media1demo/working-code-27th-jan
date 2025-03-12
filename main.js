@@ -144,6 +144,29 @@ function performMagicWandSelection(x, y) {
         redrawCanvas();
     };
     
+
+function redrawCanvas() {
+    if (!originalImage) return;
+    
+    ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+    ctx.drawImage(originalImage, 0, 0);
+    
+    // Draw existing selections
+    displaySelectedRegionsBorders();
+    
+    // Draw tool-specific previews
+    if (activeTool === 'lasso' && lassoPoints.length > 0) {
+        drawLassoPreview();
+    } else if (activeTool === 'polygonLasso' && polygonPoints.length > 0) {
+        drawPolygonPreview();
+
+    }
+    else if (activeTool === TOOLS.CIRCLE_MAGIC_WAND) {
+        drawCirclePreview();
+    }
+}
+
+    
 }
 
 
@@ -390,32 +413,16 @@ function stopDrawing() {
 // First, modify your HTML to have just one polygonLassoButton:
 // Remove the first button and keep only the one in the sidebar
 
-// Add this CSS to your styles2.css file:
-`.lasso-active {
-    cursor: crosshair !important;
-}
 
-.imageCanvas.lasso-active {
-    border: 2px dashed ;
-}
-
-#polygonLassoButton.active {
-    
-    color: black;
-}`
 
 // Add this JavaScript code:
 document.addEventListener('DOMContentLoaded', function() {
-    // Get references to DOM elements
-    // const polygonLassoButton = document.getElementById('lassoTool');
-
-
 
     
     const polygonLassoButton = document.getElementById('polygonLassoTool');
     const rectangleToolButton = document.getElementById('polygonLassoTool'); // Using the same button ID
 
-    rectangleToolButton.textContent = 'Rectangle Tool'; // Change button text
+    // rectangleToolButton.textContent = 'Rectangle Tool'; // Change button text
     
     rectangleToolButton.addEventListener('click', () => {
         activeTool = 'rectangle';

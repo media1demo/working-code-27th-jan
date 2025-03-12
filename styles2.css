@@ -3,30 +3,22 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 #creditSystem {
     position: fixed;
+    width: 350px;
     bottom: 20px;
-    right: 60px;
+    right: 0px;
+    bottom: 50px;
     background: #0f0f1b;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(69, 43, 117, 0.9);
+    /* box-shadow: 0 5px 20px rgba(69, 43, 117, 0.9); */
     color: #fff;
     text-align: center;
     z-index: 1000; /* Ensure it's above other elements */
 }
 
-
-.share-icon {
-    position: absolute;
-    right: 10px;
-    bottom: 40px; /* Position it above the download icon */
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    padding: 5px;
-    z-index: 2;
-}
 
 
 
@@ -471,30 +463,8 @@ button {
     object-fit: contain;
 }
 
-.fullscreen-icon, .shrink-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 50%;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    transition: background-color 0.3s ease;
-}
 
-.fullscreen-icon:hover, .shrink-icon:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-}
 
-.fullscreen-icon svg, .shrink-icon svg {
-    width: 16px;
-    height: 16px;
-    fill: white;
-}
 
 
 #mainContent {flex-grow: 1;
@@ -505,9 +475,9 @@ button {
         font-weight: bold;
         color: #333;
         text-align: center;
-        margin-bottom: 10px;
-        background-color: rgba(255, 255, 255, 0.8);
-        padding: 5px 10px;
+        margin-bottom: -20px;
+        /* background-color: rgba(255, 255, 255, 0.8); */
+        /* padding: 5px 10px; */
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -555,6 +525,55 @@ button {
 .lasso-active {
     cursor: crosshair !important;
 }
+.tools-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 226px;
+    /* background-color: #000000; */
+    padding: 4px;
+    border-radius: 8px;
+  }
+  
+  .tool-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 68px;
+    height: 42px;
+    /* background-color: #222; */
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+    padding: 0;
+  }
+  
+  .tool-button:first-child {
+    margin-left: 0;
+  }
+  
+  .tool-button:last-child {
+    margin-right: 0;
+  }
+  
+  .tool-button:hover {
+    background-color: #2a2a2a;
+    border-color: #333;
+  }
+  
+  .tool-button:active, .tool-button.active {
+    background-color: #333;
+    border-color: #00a3ff;
+    box-shadow: 0 0 5px rgba(0, 163, 255, 0.2);
+  }
+  
+  .tool-button svg {
+    filter: drop-shadow(0 0 3px rgba(0, 163, 255, 0.3));
+  }
+
 
 #polygonLassoTool.active,
 #lassoTool.active {
@@ -572,20 +591,13 @@ button {
 }
 
 
-.tools-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #f5f5f5;
-    border-radius: 5px;
-}
+
 
 .tool-button {
     padding: 8px 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background: white;
+    background: rgb(0, 0, 0, 0.1) !important;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1125,8 +1137,6 @@ width: 350px !important;
     padding: 8px;
     width: 100%;
     box-sizing: border-box;
-    /* background-color: rgba(255, 255, 255, 0.1); */
-    /* color: #fff;  */
 }
 
 #effectControls label {
@@ -1160,15 +1170,14 @@ width: 350px !important;
         height: 300px;
         margin: 5px; 
         text-align: center;
-    margin: 10px;
-    text-align: center;
-    background: #000000;
-    overflow: hidden; /* Ensure the animation stays within bounds */
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(145, 145, 145, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
+        margin: 10px;
+        text-align: center;
+        background: #000000;
+        overflow: hidden;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(145, 145, 145, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;    
 }
 
 .canvas-wrapper img {
@@ -1180,14 +1189,10 @@ width: 350px !important;
     object-fit: contain;
 }
 
-
-
 .canvas-wrapper:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(223, 223, 223, 0.2);
 }
-
-
 
         .top-centered-container {
             position: fixed;
@@ -1453,3 +1458,320 @@ canvas,
         min-height: 50px; /* Increase the height of the scrollbar thumb */
 
 }
+
+.feature-section {
+    background-color: #1a1a2e;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.feature-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #4CAF50;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+}
+
+.feature-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.feature-description {
+    font-size: 14px;
+    color: #dddddd;
+    margin-bottom: 10px;
+}
+
+.feature-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.feature-button:hover {
+    background-color: #3e8e41;
+}
+
+
+/* Container for action icons */
+.icon-container {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    padding: 5px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Shared styles for all action icons */
+.action-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect for action icons */
+.action-icon:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+/* Active effect for action icons */
+.action-icon:active {
+    transform: scale(0.95);
+}
+
+/* SVG styling within action icons */
+.action-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: white;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Specific styling for each icon type if needed */
+.download-icon svg {
+    stroke: white;
+}
+
+.share-icon svg {
+    stroke: white;
+    fill: none;
+}
+
+.fullscreen-icon svg {
+    stroke: white;
+}
+
+.music-icon svg {
+    stroke: white;
+    fill: none;
+}
+
+/* Dark mode / light background adjustments */
+.canvas-wrapper.light-background .icon-container {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.canvas-wrapper.light-background .action-icon {
+    background-color: rgba(50, 50, 50, 0.7);
+}
+
+.canvas-wrapper.light-background .action-icon:hover {
+    background-color: rgba(50, 50, 50, 0.9);
+}
+
+/* Loading animation for icons during processing */
+.action-icon.loading svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Make sure the wrapper has proper positioning */
+.canvas-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.tool-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px;
+    padding: 8px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .tool-button:hover {
+    background-color: #e8e8e8;
+  }
+  
+  .tool-button:active {
+    background-color: #ddd;
+    transform: translateY(1px);
+  }
+  
+  .tool-button .tooltip {
+    visibility: hidden;
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  
+  .tool-button:hover .tooltip {
+    visibility: visible;
+  }
+  
+/* Style for processed images */
+.processed-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.feature-button.secondary {
+    background-color: #666;
+}
+
+.feature-button.secondary:hover {
+    background-color: #555;
+}
+
+.performance-notice {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 166, 0, 0.1);
+    border-left: 3px solid orange;
+    padding: 8px 10px;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.file-input-label {
+    background-color: #2c2c54;
+    color: white;
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px 0;
+    border: 1px dashed #4CAF50;
+    transition: all 0.3s;
+}
+
+.file-input-label:hover {
+    background-color: #34344a;
+    border-color: #3e8e41;
+}
+
+.background-preview {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.background-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #000;
+}
+
+#applyBackground, #removeBackground {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Add a toggle style for the CPU mode button */
+#toggleNoGpuMode.active {
+    background-color: #ff4757;
+}
+
+#toggleNoGpuMode.active:hover {
+    background-color: #e04046;
+}
+
+@media (max-width: 768px) {
+    .feature-section {
+        padding: 10px;
+    }
+    
+    .feature-section h2 {
+        font-size: 1.2rem;
+    }
+}
+
+.upload-warning {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    background-color: rgba(7, 7, 7, 0.8);
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    z-index: 1000;
+    font-weight: bold;
+    opacity: 0.2;
+  }
+
+
+  .magic-wand-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .tool-button {
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .tool-button:hover {
+    background: #444;
+    border-color: #555;
+  }
+  
+  .tool-button:active {
+    background: #222;
+    border-color: #00a3ff;
+  }

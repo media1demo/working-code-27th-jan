@@ -1,20 +1,7 @@
 const effects = 
 [
 
-    // "lipsync",
-    // "lipsync1",
-    // "lipsync2",
-    // "lipsync3",
-    // "lipsync4",
-    // "lipsync5",
-    // "lipsync6",
-    // "lipsync7",
-    // "lipsync8",
-    // "lipsync9",
-    // "lipsync10",
-    // "lipsync11",
-    // "lipsync12",
-    //  "lipsync13",
+   
     //  "lipsync14",
     //  "lipsync15",
     //  "lipsync16",

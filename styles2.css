@@ -370,7 +370,11 @@ button {
     padding: 12px;
     border: none;
     border-radius: 8px;
-    background: linear-gradient(135deg, #000000, #000000);
+/*     background: linear-gradient(135deg, #000000, #000000); */
+
+        background: #0a0a0e;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
     color: #fff;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -378,7 +382,9 @@ button {
 
 #sidebar button {
     
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+/*     background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)); */
+    background: #0a0a0e;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 
     cursor: pointer;
     font-weight: bold;

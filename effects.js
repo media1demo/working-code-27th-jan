@@ -209,7 +209,6 @@ const effects =
     "kaleidoscope",
     "left10",
     "right10",
-    "lipsync1",
     "lensBlur",
     "lipsync",
     "lipsync10",

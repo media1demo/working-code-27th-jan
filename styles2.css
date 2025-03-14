@@ -370,7 +370,6 @@ button {
     padding: 12px;
     border: none;
     border-radius: 8px;
-/*     background: linear-gradient(135deg, #000000, #000000); */
 
         background: #0a0a0e;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -382,7 +381,6 @@ button {
 
 #sidebar button {
     
-/*     background: linear-gradient(to left, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0)); */
     background: #0a0a0e;
     border: 1px solid rgba(255, 255, 255, 0.05);
 

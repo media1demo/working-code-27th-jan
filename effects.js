@@ -209,7 +209,6 @@ const effects =
     "right10",
     "lensBlur",
     "lipsync",
-    "lipsync10",
     "parallax3d",
     "parallaxdown10",
     "parallaxdownsmall10",

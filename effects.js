@@ -7,7 +7,6 @@ const effects =
      "lipsync5",
      "lipsync6",
      "lipsync7",
-     "lipsync8",
      "lipsync10",
      "lipsync11",
      "lipsync12",
